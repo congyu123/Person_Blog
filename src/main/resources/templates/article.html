@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article.id==null}? '新建文章':'编辑文章'">文章编辑器</title>
+    <meta name="description" content="使用强大的富文本编辑器创建和编辑您的博客文章">
+
+    <!-- 外部资源 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+    <!-- TinyMCE 编辑器 -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        neutral: '#F3F4F6',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- 自定义样式 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .editor-shadow {
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            }
+            .btn-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
+            }
+            .form-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-dark">
+<!-- 导航栏 -->
+<div th:insert="~{nav.html}"></div>
+
+<!-- 主要内容区 -->
+<main class="container mx-auto px-4 py-8 max-w-5xl">
+    <!-- 页面标题 -->
+    <div class="mb-8">
+        <h1 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-gray-800 mb-2"
+            th:text="${article.id == null}? '创建新文章': '编辑文章'">
+            创建新文章
+        </h1>
+        <p class="text-gray-600">使用我们强大的编辑器创建引人入胜的内容</p>
+    </div>
+
+    <!-- 文章编辑器表单 -->
+    <form th:action="@{/articles/save}" th:object="${article}" method="post"
+          class="bg-white rounded-xl editor-shadow p-6 md:p-8 mb-8">
+
+        <!-- 文章基本信息 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- 标题 -->
+            <div class="md:col-span-3">
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-1">文章标题 <span class="text-red-500">*</span></label>
+                <input type="text" id="title" th:field="*{title}" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 form-focus"
+                       placeholder="输入引人注目的标题">
+                <p class="mt-1 text-xs text-gray-500">请输入不超过200个字符的标题</p>
+            </div>
+
+            <!-- 分类 -->
+            <div class="md:col-span-2">
+                <label for="categoryId" class="block text-sm font-medium text-gray-700 mb-1">文章分类 <span class="text-red-500">*</span></label>
+                <select id="categoryId" th:field="*{categoryId}" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 form-focus">
+                    <option value="">— 选择分类 —</option>
+                    <th:block th:each="cat : ${categories}">
+                        <optgroup th:label="${cat.name}">
+                            <option th:each="c2 : ${cat.children}"
+                                    th:value="${c2.id}" th:text="${c2.name}"></option>
+                        </optgroup>
+                    </th:block>
+                </select>
+            </div>
+
+            <!-- 标签 -->
+            <div>
+                <label for="tags" class="block text-sm font-medium text-gray-700 mb-1">标签</label>
+                <input type="text" id="tags" th:field="*{tags}"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 form-focus"
+                       placeholder="Java,Spring,编程">
+                <p class="mt-1 text-xs text-gray-500">用逗号分隔多个标签</p>
+            </div>
+        </div>
+
+        <!-- 富文本编辑器 -->
+        <div class="mb-8">
+            <label for="content" class="block text-sm font-medium text-gray-700 mb-1">文章内容 <span class="text-red-500">*</span></label>
+            <div id="editor-container" class="border border-gray-300 rounded-lg overflow-hidden">
+                <!-- TinyMCE 编辑器将在这里初始化 -->
+                <div th:utext="${article.content}"></div>
+            </div>
+            <input type="hidden" id="content" name="content" th:field="*{content}">
+        </div>
+
+        <!-- 编辑器工具栏 -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center">
+                    <input type="checkbox" id="autoSave" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                    <label for="autoSave" class="ml-2 text-sm text-gray-700">自动保存草稿</label>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <span id="wordCount">0</span> 字
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" id="previewBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 btn-hover">
+                    <i class="fa fa-eye mr-1"></i> 预览
+                </button>
+                <button type="button" id="uploadImageBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 btn-hover">
+                    <i class="fa fa-image mr-1"></i> 上传图片
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-end gap-4">
+            <button type="button" id="discardBtn" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 btn-hover">
+                <i class="fa fa-trash-o mr-1"></i> 丢弃
+            </button>
+            <button type="submit" name="action" value="draft" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 btn-hover">
+                <i class="fa fa-save mr-1"></i> 保存草稿
+            </button>
+            <button type="submit" name="action" value="publish" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 btn-hover">
+                <i class="fa fa-paper-plane mr-1"></i> 提交审核
+            </button>
+        </div>
+    </form>
+
+    <!-- 预览模态框 -->
+    <div id="previewModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto m-4">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-medium">文章预览</h3>
+                <button id="closePreviewBtn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div id="previewContent" class="p-6 min-h-[300px]"></div>
+            <div class="p-4 border-t flex justify-end">
+                <button id="closePreviewBtn2" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                    关闭预览
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<div th:insert="~{footer.html}"></div>
+
+
+<!-- JavaScript -->
+<script>
+    // 初始化TinyMCE编辑器
+    tinymce.init({
+        selector: '#editor-container',
+        height: 500,
+        menubar: false,
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | bold italic backcolor | ' +
+            'alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | removeformat | help',
+        content_style: 'body { font-family:Inter,sans-serif; font-size:16px }',
+        setup: function(editor) {
+            // 编辑器内容变化时更新字数统计
+            editor.on('change', function() {
+                updateWordCount(editor.getContent({format: 'text'}).length);
+            });
+
+            // 自动保存草稿功能
+            if (document.getElementById('autoSave').checked) {
+                editor.on('change', debounce(function() {
+                    autoSaveDraft(editor.getContent());
+                }, 3000));
+            }
+        },
+        init_instance_callback: function(editor) {
+            // 初始化时如果有内容，加载到编辑器中
+            const content = /*<![CDATA[*/ [[(${article.content})]] /*]]*/;
+            if (content) {
+                editor.setContent(content);
+                updateWordCount(content.length);
+            }
+        }
+    });
+
+    // 提交表单前同步编辑器内容到隐藏域
+    document.querySelector('form').addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') {
+            document.getElementById('content').value = tinymce.activeEditor.getContent();
+        }
+    });
+
+    // 更新字数统计
+    function updateWordCount(count) {
+        document.getElementById('wordCount').textContent = count;
+    }
+
+    // 预览功能
+    document.getElementById('previewBtn').addEventListener('click', function() {
+        if (typeof tinymce !== 'undefined') {
+            document.getElementById('previewContent').innerHTML = tinymce.activeEditor.getContent();
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+    });
+
+    // 关闭预览
+    document.getElementById('closePreviewBtn').addEventListener('click', function() {
+        document.getElementById('previewModal').classList.add('hidden');
+    });
+
+    document.getElementById('closePreviewBtn2').addEventListener('click', function() {
+        document.getElementById('previewModal').classList.add('hidden');
+    });
+
+    // 点击模态框背景关闭预览
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+
+    // 自动保存草稿
+    function autoSaveDraft(content) {
+        // 这里只是模拟自动保存，实际项目中应该发送AJAX请求到服务器
+        console.log('自动保存草稿:', content.substring(0, 50) + '...');
+        // 显示保存提示
+        showNotification('草稿已自动保存');
+    }
+
+    // 显示通知
+    function showNotification(message) {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        notification.textContent = message;
+
+        // 添加到页面
+        document.body.appendChild(notification);
+
+        // 3秒后移除
+        setTimeout(() => {
+            notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+
+    // 丢弃确认
+    document.getElementById('discardBtn').addEventListener('click', function() {
+        if (confirm('确定要丢弃当前编辑的内容吗？所有更改都将丢失。')) {
+            window.history.back();
+        }
+    });
+
+    // 防抖函数
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    // 上传图片按钮点击事件
+    document.getElementById('uploadImageBtn').addEventListener('click', function() {
+        // 这里只是模拟图片上传，实际项目中应该打开文件选择对话框或上传组件
+        alert('图片上传功能将在这里实现');
+    });
+</script>
+</body>
+</html>

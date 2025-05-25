@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* 自定义切换按钮图标颜色 */
+        }
+
+        .nav-item .btn {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #333;
+        }
+
+        .nav-item .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+            color: #fff;
+        }
+
+        .nav-item .btn-outline-light {
+            color: #fff;
+        }
+
+        .nav-item .btn-outline-light:hover {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .user-profile img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <span>博客平台</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="切换导航">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="btn btn-outline-light ms-2" th:href="@{/}">首页</a>
+            </li>
+            <li class="nav-item">
+            <a class="btn btn-outline-light ms-2" th:href="@{/articles}">文章</a>
+        </li>
+
+        </ul>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+                <!-- 未登录：登录 / 注册 按钮 -->
+                <li th:if="${session.currentUser == null}" class="nav-item">
+                    <a class="btn btn-warning ms-2" th:href="@{/login}">登录</a>
+                </li>
+                <li th:if="${session.currentUser == null}" class="nav-item">
+                    <a class="btn btn-outline-light ms-2" th:href="@{/register}">注册</a>
+                </li>
+                <!-- 已登录：显示头像和用户名 -->
+                <li th:unless="${session.currentUser == null}" class="nav-item me-3 user-profile">
+                    <a th:href="@{/profile}">
+                        <img th:src="'uploads/avatars/' + ${session.currentUser.avatar_url}" alt="头像" class="rounded-circle">
+                        <span th:text="${session.currentUser.nickname}"></span>
+                    </a>
+                </li>
+                <!-- 已登录：退出按钮 -->
+                <li th:unless="${session.currentUser == null}" class="nav-item">
+                    <a class="btn btn-outline-light ms-2" th:href="@{/logout}">退出</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

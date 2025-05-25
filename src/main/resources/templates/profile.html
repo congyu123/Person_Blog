@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .rounded-circle {
+            width: 128px;
+            height: 128px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .rounded-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .btn-primary, .btn-warning {
+            border-radius: 30px;
+            font-weight: bold;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{nav.html}"></div>
+
+<div class="profile-container">
+    <h2 class="mb-4">个人中心</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">编辑个人信息</div>
+        <div class="card-body">
+            <form id="profileForm" th:action="@{/profile/info}" method="post" enctype="multipart/form-data">
+                <div id="msgBox"></div>
+
+                <div class="mb-3 text-center">
+                    <label class="form-label d-block">当前头像</label>
+                    <img th:src="'uploads/avatars/' + ${session.currentUser.avatar_url}"
+                         alt="头像" class="rounded-circle mb-2">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">上传新头像</label>
+                    <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*">
+                </div>
+
+                <!-- 预览 -->
+                <div class="mb-3" id="previewBox" style="display:none;">
+                    <label class="form-label">新头像预览</label><br/>
+                    <img id="previewAvatar"
+                         class="rounded-circle"
+                         style="width:128px;height:128px;object-fit:cover;">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">昵称</label>
+                    <input type="text" name="nickname" class="form-control"
+                           th:value="${user.nickname}" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">简介</label>
+                    <textarea name="bio" rows="3" class="form-control"
+                              th:text="${user.bio}"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">保存信息</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 密码修改 -->
+    <div class="card">
+        <div class="card-header">修改密码</div>
+        <div class="card-body">
+            <form th:action="@{/profile/password}" method="post">
+                <div th:if="${errorPwd}" class="alert alert-danger" th:text="${errorPwd}"></div>
+                <div th:if="${successPwd}" class="alert alert-success" th:text="${successPwd}"></div>
+
+                <div class="mb-3">
+                    <label>旧密码</label>
+                    <input type="password" name="oldPassword" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label>新密码</label>
+                    <input type="password" name="newPassword" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label>确认新密码</label>
+                    <input type="password" name="confirmPassword" class="form-control" required/>
+                </div>
+                <button type="submit" class="btn btn-warning">修改密码</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script>
+    $(function(){
+        // 本地预览
+        $('#avatarInput').on('change', function(){
+            const file = this.files[0];
+            if(!file) return $('#previewBox').hide();
+            const reader = new FileReader();
+            reader.onload = e => {
+                $('#previewAvatar').attr('src', e.target.result);
+                $('#previewBox').show();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // AJAX 提交
+        $('#profileForm').on('submit', function(e){
+            e.preventDefault();
+            const form = this;
+            const data = new FormData(form);
+            $.ajax({
+                url: form.action,
+                type: 'POST',
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                headers: {'X-Requested-With':'XMLHttpRequest'},
+                success(res) {
+                    if(res.success) {
+                        $('#msgBox').html('<div class="alert alert-success">更新成功！</div>');
+                        $('#previewBox').hide();
+                        form.reset();
+
+                        setTimeout(function() {
+                            location.reload();
+                        }, 800);
+                    } else {
+                        $('#msgBox').html('<div class="alert alert-danger">更新失败：'+ (res.error||'未知') +'</div>');
+                    }
+                },
+                error() {
+                    $('#msgBox').html('<div class="alert alert-danger">网络或服务器错误</div>');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
