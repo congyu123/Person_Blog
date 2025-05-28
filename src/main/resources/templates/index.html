@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>博客平台 - 首页</title>
-    <!-- 引入 Google 字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <style>
         body {
             font-family: 'Noto Sans SC', sans-serif;
@@ -125,12 +126,7 @@
     </div>
 </section>
 
-<!-- 底部 -->
-<footer>
-    <div class="container">
-        <p>&copy; 2025 博客平台. 保留所有权利.</p>
-    </div>
-</footer>
+<div th:insert="~{footer.html}"></div>
 
 <script th:src="@{/js/bootstrap.min.js}"></script>
 </body>
