@@ -16,8 +16,6 @@ public class Category {
     @Column(length = 100, nullable = false)
     private String name;
 
-    @Column(name = "parent_id")
-    private Integer parentId;
 
     public Integer getId() {
         return id;
@@ -35,13 +33,6 @@ public class Category {
         this.name = name;
     }
 
-    public Integer getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Integer parentId) {
-        this.parentId = parentId;
-    }
 
     public List<Category> getChildren() {
         return children;

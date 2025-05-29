@@ -8,4 +8,5 @@ import java.util.List;
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
     List<Article> findByAuthorId(Integer authorId);
     List<Article> findByAuthorIdAndStatus(Integer authorId, Status status);
+
 }

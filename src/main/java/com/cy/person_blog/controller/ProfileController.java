@@ -1,6 +1,8 @@
 package com.cy.person_blog.controller;
 
+import com.cy.person_blog.entity.Article;
 import com.cy.person_blog.entity.User;
+import com.cy.person_blog.service.ArticleService;
 import com.cy.person_blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,7 +20,7 @@ public class ProfileController {
 
     @Autowired private UserService userService;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
-
+    @Autowired private ArticleService articleService;
 
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
@@ -28,11 +30,18 @@ public class ProfileController {
         }
         User user = userService.findById(current.getId());
         model.addAttribute("user", user);
-
+        Integer userId = current.getId();
         String avatarUrl = user.getAvatar_url() != null
                 ? "/uploads/avatars/" + user.getAvatar_url()
                 : "/static/img/default-avatar.png";
         model.addAttribute("userAvatarUrl", avatarUrl);
+        model.addAttribute("publishedArticles",
+                articleService.getByAuthorAndStatus(userId, Article.Status.PUBLISHED));
+        model.addAttribute("pendingArticles",
+                articleService.getByAuthorAndStatus(userId, Article.Status.PENDING));
+        model.addAttribute("draftArticles",
+                articleService.getByAuthorAndStatus(userId, Article.Status.DRAFT));
+
         return "profile";
     }
 
@@ -91,4 +100,5 @@ public class ProfileController {
         model.addAttribute("user", fresh);
         return "profile";
     }
+
 }

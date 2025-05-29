@@ -16,6 +16,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleRepository articleRepo;
 
+
+
+    @Override
+    public List<Article> getByAuthorAndStatus(Integer authorId, Status status) {
+        return articleRepo.findByAuthorIdAndStatus(authorId, status);
+    }
+
     @Override
     public Article findById(Integer id) {
         return articleRepo.findById(id).orElse(null);

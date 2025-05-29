@@ -31,10 +31,10 @@ public class ArticleController {
         Article article = (id == null)
                 ? new Article()
                 : articleService.findById(id);
-        List<Category> categories = categoryService.findAllTree();
+        List<Category> categories = categoryService.findAll();
         model.addAttribute("article", article);
         model.addAttribute("categories", categories);
-        return "article";
+        return "publish_article";
     }
 
     // 保存（包括草稿箱和发布）
@@ -49,6 +49,6 @@ public class ArticleController {
         // action: "draft" 或 "publish"
         article.setStatus(Article.Status.valueOf("draft".equals(action) ? "DRAFT" : "PENDING"));
         articleService.saveOrUpdate(article);
-        return "redirect:/dashboard";
+        return "redirect:/profile";
     }
 }

@@ -5,5 +5,6 @@ import com.cy.person_blog.entity.Category;
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> findAllTree();
+
+    List<Category> findAll();
 }
