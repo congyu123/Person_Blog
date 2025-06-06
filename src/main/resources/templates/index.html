@@ -160,10 +160,9 @@
                           th:if="${cat.id == article.categoryId}"
                           th:text="${cat.name}"></span>
                     &nbsp;|&nbsp;
-                    标签：
-                    <span th:each="t : ${#strings.split(article.tags, ',')}"
-                          class="badge bg-secondary me-1"
-                          th:text="${t}"></span>
+
+
+
                 </div>
                 <p th:utext="${#strings.length(article.content) > 150 ? #strings.substring(article.content, 0, 150) + '...' : article.content}"></p>
                 <a th:href="@{/articles/{id}(id=${article.id})}" class="btn btn-sm btn-primary">阅读全文</a>
@@ -175,15 +174,12 @@
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/(page=${currentPage - 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
-                       th:unless="${currentPage == 1}">
+                       th:href="@{/(page=${currentPage > 1 ? currentPage - 1 : 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}">
                         上一页
                     </a>
-                    <a class="page-link" href="#" th:if="${currentPage == 1}">上一页</a>
                 </li>
 
-                <li class="page-item"
-                    th:each="i : ${#numbers.sequence(1, totalPages)}"
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
                     th:classappend="${i == currentPage} ? 'active'">
                     <a class="page-link"
                        th:href="@{/(page=${i}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
@@ -192,14 +188,13 @@
 
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/(page=${currentPage + 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
-                       th:unless="${currentPage == totalPages}">
+                       th:href="@{/(page=${currentPage < totalPages ? currentPage + 1 : totalPages}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}">
                         下一页
                     </a>
-                    <a class="page-link" href="#" th:if="${currentPage == totalPages}">下一页</a>
                 </li>
             </ul>
         </nav>
+
     </div>
 
 </div>

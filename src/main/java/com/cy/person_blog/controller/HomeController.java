@@ -24,21 +24,17 @@ public class HomeController {
 
 
     @GetMapping("/")
-    public String viewHomePage(
-            Model model,
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
-            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
-            @RequestParam(value = "categoryId", required = false) Integer categoryId,
-            @RequestParam(value = "tag", required = false) String tag
-    ) {
+    public String viewHomePage(Model model,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "size", defaultValue = "10") int size,
+                               @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
+                               @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                               @RequestParam(value = "categoryId", required = false) Integer categoryId,
+                               @RequestParam(value = "tag", required = false) String tag) {
         List<Category> categories = categoryService.listAllCategories();
         model.addAttribute("categories", categories);
 
-        Page<Article> articlePage = articleService.listPublishedArticles(
-                page, size, sortField, sortDir, categoryId, tag
-        );
+        Page<Article> articlePage = articleService.listPublishedArticles(page, size, sortField, sortDir, categoryId, tag);
 
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", articlePage.getTotalPages());
@@ -50,7 +46,9 @@ public class HomeController {
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
         model.addAttribute("selectedCategory", categoryId == null ? 0 : categoryId);
         model.addAttribute("selectedTag", tag == null ? "" : tag);
+        model.addAttribute("size", size);
 
         return "index";
     }
+
 }

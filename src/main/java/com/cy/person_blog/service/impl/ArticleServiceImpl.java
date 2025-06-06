@@ -54,37 +54,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Page<Article> listPublishedArticles(int page, int size, String sortField, String sortDir, Integer categoryId, String tagKeyword) {
-        Pageable pageable = PageRequest.of(page-1, size, sortDir.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending());
-        if ((categoryId == null || categoryId == 0) && (tagKeyword == null || tagKeyword.isEmpty())) {
-            return articleRepo.findByStatusAndCategoryIdAndTagsContaining(
-                    Article.Status.PUBLISHED,
-                    null,
-                    "",
-                    pageable
-            );
-        } else if (categoryId == null || categoryId == 0) {
-            return articleRepo.findByStatusAndCategoryIdAndTagsContaining(
-                    Article.Status.PUBLISHED,
-                    null,
-                    "%" + tagKeyword + "%",
-                    pageable
-            );
-        } else if (tagKeyword == null || tagKeyword.isEmpty()) {
-            return articleRepo.findByStatusAndCategoryIdAndTagsContaining(
-                    Article.Status.PUBLISHED,
-                    categoryId,
-                    "",
-                    pageable
-            );
-        } else {
-            return articleRepo.findByStatusAndCategoryIdAndTagsContaining(
-                    Article.Status.PUBLISHED,
-                    categoryId,
-                    "%" + tagKeyword + "%",
-                    pageable
-            );
-        }
+        Pageable pageable = PageRequest.of(page - 1, size,
+                sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending());
+
+        String tagParam = (tagKeyword == null || tagKeyword.trim().isEmpty()) ? null : tagKeyword.trim();
+
+        Integer catParam = (categoryId == null || categoryId == 0) ? null : categoryId;
+
+        return articleRepo.findByStatusAndOptionalCategoryIdAndTag(Article.Status.PUBLISHED, catParam, tagParam, pageable);
     }
+
 
     @Override
     public Article getPublishedArticleById(Integer id) {

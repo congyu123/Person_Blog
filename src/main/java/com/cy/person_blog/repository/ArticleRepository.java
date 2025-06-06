@@ -28,4 +28,12 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
             String tagKeyword,
             Integer excludeId
     );
+    @Query("select a from Article a where a.status = :status "
+            + "and (:categoryId is null or a.categoryId = :categoryId) "
+            + "and (:tag is null or a.tags like %:tag%)")
+    Page<Article> findByStatusAndOptionalCategoryIdAndTag(@Param("status") Status status,
+                                                          @Param("categoryId") Integer categoryId,
+                                                          @Param("tag") String tag,
+                                                          Pageable pageable);
+
 }
