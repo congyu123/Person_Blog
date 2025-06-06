@@ -11,7 +11,7 @@
  Target Server Version : 80021
  File Encoding         : 65001
 
- Date: 21/05/2025 08:27:02
+ Date: 01/06/2025 21:59:07
 */
 
 SET NAMES utf8mb4;
@@ -32,11 +32,18 @@ CREATE TABLE `article`  (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of article
 -- ----------------------------
+INSERT INTO `article` VALUES (1, 7, 'ee', '', '11', 'PENDING', NULL, '2025-05-21 11:40:15', '2025-05-21 11:40:15');
+INSERT INTO `article` VALUES (2, 7, 'java', '<div>java代码</div>', 'Springboot', 'DRAFT', 1, '2025-05-28 08:57:36', '2025-05-28 08:57:36');
+INSERT INTO `article` VALUES (3, 7, 'java', '<div>Java哈哈哈</div>', 'Springboot', 'PENDING', 1, '2025-05-28 08:57:46', '2025-05-28 08:57:46');
+INSERT INTO `article` VALUES (4, 7, 'JAVA', '<h1>Springboot</h1>', '编程', 'PENDING', 1, '2025-05-28 09:01:47', '2025-05-28 09:01:47');
+INSERT INTO `article` VALUES (5, 7, 'SpringBoot', '<h1>SpringBoot</h1>', 'Spring', 'DRAFT', 8, '2025-05-28 10:38:56', '2025-05-28 10:38:56');
+INSERT INTO `article` VALUES (6, 7, '大学', '<div>哈哈哈哈哈哈哈</div>', '生活', 'DRAFT', 2, '2025-05-28 11:10:18', '2025-05-28 11:10:18');
+INSERT INTO `article` VALUES (7, 7, '大学', '<p>哇哇哇阿瓦阿瓦</p>', '生活', 'PUBLISHED', 2, '2025-05-28 11:10:44', '2025-05-28 11:37:58');
 
 -- ----------------------------
 -- Table structure for category
@@ -45,13 +52,20 @@ DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `parent_id` int NULL DEFAULT NULL COMMENT '上级分类 ID，可自行管理层级关系',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of category
 -- ----------------------------
+INSERT INTO `category` VALUES (1, '技术');
+INSERT INTO `category` VALUES (2, '生活');
+INSERT INTO `category` VALUES (3, '新闻');
+INSERT INTO `category` VALUES (4, '旅行');
+INSERT INTO `category` VALUES (5, '美食');
+INSERT INTO `category` VALUES (6, '编程');
+INSERT INTO `category` VALUES (7, '设计');
+INSERT INTO `category` VALUES (8, '工具');
 
 -- ----------------------------
 -- Table structure for comment
@@ -134,6 +148,6 @@ INSERT INTO `user` VALUES (3, 'cycy@qq.com', '$2a$10$SSDu7G7xoNso6YUMq8OUPuoC8WD
 INSERT INTO `user` VALUES (4, 'cycy@163.com', '$2a$10$m/cJ.p54k0FvDRkKgOKFOeRET1lZsPSGe9Qprh64QPO9FEntopd4i', 'cycy', NULL, '/static/img/default-avatar.png', 'ACTIVE', 0, '2025-05-07 10:34:21');
 INSERT INTO `user` VALUES (5, 'aa@qq.com', '$2a$10$pZNoGm3oTOOaDgqomEkKUO5CBMSj8NTjHy7jF7kzhG2eIM0PYyPSC', 'aa', NULL, '/static/img/default-avatar.png', 'ACTIVE', 0, '2025-05-07 11:43:19');
 INSERT INTO `user` VALUES (6, 'ww@163.com', '1234', 'ww666', NULL, '/static/img/default-avatar.png', 'ACTIVE', 0, '2025-05-14 08:00:30');
-INSERT INTO `user` VALUES (7, 'ee@qq.com', '$2a$10$XFXf8GXywSAs.oK6w.Lho.TjmIVuqEpHfF5UCJL/ie00eU2TjjA1y', 'eett', 'eeee', '98011f91-956c-43f5-9a93-644485c95f18.jpg', 'ACTIVE', 0, '2025-05-14 08:54:39');
+INSERT INTO `user` VALUES (7, 'ee@qq.com', '$2a$10$XFXf8GXywSAs.oK6w.Lho.TjmIVuqEpHfF5UCJL/ie00eU2TjjA1y', 'eett', 'feichanghao1', '3ae872b7-2ffc-408a-b6cb-276dec022cfd.jpg', 'ACTIVE', 0, '2025-05-14 08:54:39');
 
 SET FOREIGN_KEY_CHECKS = 1;

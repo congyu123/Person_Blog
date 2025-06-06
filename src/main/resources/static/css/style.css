@@ -1,58 +1,187 @@
 
-.padding10{
-    padding:10px;
+/* 通用样式 */
+body {
+    background-color: #f8f9fa;
 }
 
-tr>th{
-    text-align: center;
+.padding10 {
+    padding: 10px;
 }
 
-ul{
-    line-height: 30px;
+/* 博客卡片样式 */
+.blog-list .card {
+    transition: transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.fixedWidth{
-    width: 197px!important;
+.blog-list .card:hover {
+    transform: translateY(-5px);
 }
 
+.blog-list .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
 
-.dataDiv{
+.blog-list .card-title a:hover {
+    color: #007bff !important;
+}
+
+.blog-list .card-text {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* 博客元信息样式 */
+.blog-meta {
+    font-size: 0.875rem;
+}
+
+.blog-meta i {
+    color: #6c757d;
+    margin-right: 4px;
+}
+
+.blog-stats {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.blog-stats i {
+    margin-right: 4px;
+}
+
+/* 标签样式 */
+.badge {
+    font-weight: normal;
+    padding: 0.5em 0.8em;
+}
+
+.tag-cloud a {
+    margin: 2px;
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.tag-cloud a:hover {
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+}
+
+/* 分页控件样式 */
+.pagination {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.pagination .page-link {
+    color: #007bff;
+    border: none;
+    margin: 0 3px;
+    border-radius: 4px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+}
+
+/* 侧边栏样式 */
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 2px solid #f8f9fa;
+    padding: 1rem;
+}
+
+.card-header h5 {
+    margin: 0;
+    color: #343a40;
+}
+
+.card-header i {
+    margin-right: 0.5rem;
+    color: #007bff;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1rem;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item-action:hover {
+    transform: translateX(5px);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* 搜索框样式 */
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .btn {
+    border-left: none;
+    background-color: white;
+}
+
+.input-group .btn:hover {
+    background-color: #f8f9fa;
+}
+
+/* 保留原有的其他样式 */
+.dataDiv {
     border-radius: 20px;
     margin: 15px;
     height: 170px;
-    padding:15px 10px 10px 10px;
-    line-height:1.42857143;
+    padding: 15px 10px 10px 10px;
+    line-height: 1.42857143;
     color: darkcyan;
-    border-top:1px solid #ddd;
-    border-left:1px solid #ddd;
-    border-radius:4px;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-radius: 4px;
     display: inline-block;
     width: 15%;
     box-shadow: 5px 5px 5px lightblue;
     transition: 0.5s;
 }
 
-.dataDiv:hover{
+.dataDiv:hover {
     transform: scale(0.8,0.8) rotate(30deg);
 }
 
-.dataDiv a{
+.dataDiv a {
     color: #d9534f;
 }
 
-.desc{
-	padding: 20px;
+.desc {
+    padding: 20px;
 }
 
-.subTitle{
-	display: block;
-	padding-left: 50px;
-	color: darkcyan;
-	font-size: 80%;
-	margin-top:5px;
+.subTitle {
+    display: block;
+    padding-left: 50px;
+    color: darkcyan;
+    font-size: 80%;
+    margin-top: 5px;
 }
 
-th,td{
-	padding: 10px;
-	text-align: center;
+th, td {
+    padding: 10px;
+    text-align: center;
 }

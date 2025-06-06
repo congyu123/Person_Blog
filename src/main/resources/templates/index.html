@@ -108,24 +108,101 @@
 <!-- 导航栏 -->
 <div th:insert="~{nav.html}"></div>
 
-<!-- 主要内容区域 -->
-<section class="hero">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card p-5 shadow-sm">
-                    <h1 class="display-4">欢迎来到博客平台</h1>
-                    <p class="lead">分享你的想法与故事，与世界连接。</p>
-                    <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a class="btn btn-warning btn-lg" th:href="@{/login}">立即登录</a>
-                        <a class="btn btn-outline-dark btn-lg" th:href="@{/register}">注册账号</a>
-                    </div>
+<div class="container mt-4">
+    <!-- 筛选表单 -->
+    <form class="row mb-3" th:action="@{/}" method="get">
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select">
+                <option value="0" th:selected="${selectedCategory == 0}">所有分类</option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:selected="${cat.id == selectedCategory}">
+                </option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="tag" class="form-control"
+                   placeholder="标签"
+                   th:value="${selectedTag}" />
+        </div>
+        <div class="col-md-2">
+            <select name="sortField" class="form-select">
+                <option value="createdAt" th:selected="${sortField == 'createdAt'}">按时间</option>
+                <option value="viewCount" th:selected="${sortField == 'viewCount'}">按热度</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="sortDir" class="form-select">
+                <option value="desc" th:selected="${sortDir == 'desc'}">降序</option>
+                <option value="asc" th:selected="${sortDir == 'asc'}">升序</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">筛 选</button>
+        </div>
+    </form>
+
+    <div class="container mt-4">
+
+        <!-- 文章列表 -->
+        <div th:each="article : ${articles}" class="card mb-4">
+            <div class="card-body">
+                <h3>
+                    <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}">文章标题</a>
+                </h3>
+                <div class="text-muted mb-2">
+                    发布于：
+                    <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    &nbsp;|&nbsp;
+                    分类：
+                    <span th:each="cat : ${categories}"
+                          th:if="${cat.id == article.categoryId}"
+                          th:text="${cat.name}"></span>
+                    &nbsp;|&nbsp;
+                    标签：
+                    <span th:each="t : ${#strings.split(article.tags, ',')}"
+                          class="badge bg-secondary me-1"
+                          th:text="${t}"></span>
                 </div>
+                <p th:utext="${#strings.length(article.content) > 150 ? #strings.substring(article.content, 0, 150) + '...' : article.content}"></p>
+                <a th:href="@{/articles/{id}(id=${article.id})}" class="btn btn-sm btn-primary">阅读全文</a>
             </div>
         </div>
-    </div>
-</section>
 
+        <!-- 分页导航 -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${currentPage - 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
+                       th:unless="${currentPage == 1}">
+                        上一页
+                    </a>
+                    <a class="page-link" href="#" th:if="${currentPage == 1}">上一页</a>
+                </li>
+
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/(page=${i}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
+                       th:text="${i}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${currentPage + 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, categoryId=${selectedCategory}, tag=${selectedTag})}"
+                       th:unless="${currentPage == totalPages}">
+                        下一页
+                    </a>
+                    <a class="page-link" href="#" th:if="${currentPage == totalPages}">下一页</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
 <div th:insert="~{footer.html}"></div>
 
 <script th:src="@{/js/bootstrap.min.js}"></script>

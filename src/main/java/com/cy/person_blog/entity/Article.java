@@ -2,7 +2,7 @@
 package com.cy.person_blog.entity;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "article")
@@ -12,42 +12,56 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
-    @Column(name = "author_id", nullable = false)
+    @Column(name = "author_id")
     private Integer authorId;
 
-    @Column(length = 200, nullable = false)
     private String title;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(length = 500)
-    private String tags;          // 逗号分隔
+    private String tags;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;        // DRAFT, PENDING, PUBLISHED
+    private Status status;
 
     @Column(name = "category_id")
     private Integer categoryId;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+
+    private Date createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+
+    private Date updatedAt;
+
+    @Transient
+    private String authorName;
+
+    @Transient
+    private String categoryName;
+
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
+    public Integer getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(Integer viewCount) {
+        this.viewCount = viewCount;
+    }
 
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
+        createdAt = new Date();
+        updatedAt = new Date();
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = new Date();
     }
 
     public enum Status {
@@ -110,19 +124,19 @@ public class Article {
         this.categoryId = categoryId;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

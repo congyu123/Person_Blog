@@ -8,12 +8,12 @@
 
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    
+
     <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
-    
+
     <script th:src="@{/js/jquery-3.4.1.min.js}"></script>
     <script th:src="@{/js/script.js}"></script>
-    
+
     <script src="https://cdn.tiny.cloud/1/06mgxbb0gy55nbt4wovgzw4rfznjs93dlm4jwkrupfcubr9o/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
     <style>
@@ -37,7 +37,7 @@
 
 
 <main class="container py-5">
-    
+
     <div class="mb-4">
         <h1 class="display-4 mb-2"
             th:text="${article.id == null}? '创建新文章': '编辑文章'">
@@ -46,13 +46,13 @@
         <p class="text-muted">使用我们强大的编辑器创建引人入胜的内容</p>
     </div>
 
-    
+
     <form th:action="@{/articles/save}" th:object="${article}" method="post"
           class="bg-white shadow rounded p-4 mb-4">
 
-        
+
         <div class="row mb-4">
-            
+
             <div class="col-12 mb-3">
                 <label for="title" class="form-label">文章标题 <span class="text-danger">*</span></label>
                 <input type="text" id="title" th:field="*{title}" required
@@ -61,7 +61,7 @@
                 <div class="form-text">请输入不超过200个字符的标题</div>
             </div>
 
-            
+
             <div class="col-md-8 mb-3">
                 <label for="categoryId" class="form-label">文章分类 <span class="text-danger">*</span></label>
                 <select id="categoryId" th:field="*{categoryId}" required
@@ -71,7 +71,7 @@
                 </select>
             </div>
 
-            
+
             <div class="col-md-4 mb-3">
                 <label for="tags" class="form-label">标签</label>
                 <input type="text" id="tags" th:field="*{tags}"
@@ -81,17 +81,17 @@
             </div>
         </div>
 
-        
+
         <div class="mb-4">
             <label for="content" class="form-label">文章内容 <span class="text-danger">*</span></label>
             <div id="editor-container" class="border rounded editor-shadow">
-                
+
                 <div th:utext="${article.content}"></div>
             </div>
             <input type="hidden" id="content" name="content" th:field="*{content}">
         </div>
 
-        
+
         <div class="mb-4">
             <div class="row align-items-center mb-3">
                 <div class="col-md-6">
@@ -196,7 +196,7 @@
     }
 
     const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
-    
+
     document.getElementById('previewBtn').addEventListener('click', function() {
         if (typeof tinymce !== 'undefined') {
             document.getElementById('previewContent').innerHTML = tinymce.activeEditor.getContent();
@@ -212,52 +212,52 @@
     function showNotification(message, type = 'success') {
         const toastContainer = document.createElement('div');
         toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        
+
         const toastEl = document.createElement('div');
         toastEl.className = 'toast';
         toastEl.setAttribute('role', 'alert');
         toastEl.setAttribute('aria-live', 'assertive');
         toastEl.setAttribute('aria-atomic', 'true');
-        
+
         const toastHeader = document.createElement('div');
         toastHeader.className = 'toast-header';
-        
+
         const icon = document.createElement('i');
         icon.className = type === 'success' ? 'fa fa-check-circle text-success me-2' : 'fa fa-exclamation-circle text-danger me-2';
-        
+
         const title = document.createElement('strong');
         title.className = 'me-auto';
         title.textContent = type === 'success' ? '成功' : '错误';
-        
+
         const closeButton = document.createElement('button');
         closeButton.type = 'button';
         closeButton.className = 'btn-close';
         closeButton.setAttribute('data-bs-dismiss', 'toast');
         closeButton.setAttribute('aria-label', 'Close');
-        
+
         const toastBody = document.createElement('div');
         toastBody.className = 'toast-body';
         toastBody.textContent = message;
-        
+
         // 组装 Toast
         toastHeader.appendChild(icon);
         toastHeader.appendChild(title);
         toastHeader.appendChild(closeButton);
-        
+
         toastEl.appendChild(toastHeader);
         toastEl.appendChild(toastBody);
-        
+
         toastContainer.appendChild(toastEl);
-        
+
         // 添加到页面
         document.body.appendChild(toastContainer);
-        
+
         // 初始化并显示 Toast
         const toast = new bootstrap.Toast(toastEl, {
             delay: 3000
         });
         toast.show();
-        
+
         // Toast 隐藏后移除元素
         toastEl.addEventListener('hidden.bs.toast', function() {
             document.body.removeChild(toastContainer);

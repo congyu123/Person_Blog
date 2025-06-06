@@ -233,6 +233,7 @@
     </style>
 </head>
 <body>
+
 <div th:insert="~{nav.html}"></div>
 
 <div class="profile-container">
@@ -247,26 +248,27 @@
                     <div id="msgBox"></div>
 
                     <div class="avatar-section">
-                        <img th:src="'uploads/avatars/' + ${session.currentUser.avatar_url}"
-                             alt="头像" class="rounded-circle mb-3">
+                        <!-- 使用 controller 里算好的 userAvatarUrl -->
+                        <img th:src="@{${userAvatarUrl}}"
+                        alt="头像" class="rounded-circle mb-3" />
 
                         <div class="mb-3 w-100">
                             <label class="form-label">更换头像</label>
-                            <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*">
+                            <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*" />
                         </div>
                     </div>
 
                     <div class="preview-box" id="previewBox" style="display:none;">
                         <label class="form-label">预览新头像</label>
                         <div class="mt-3">
-                            <img id="previewAvatar" class="rounded-circle" style="width:150px;height:150px;">
+                            <img id="previewAvatar" class="rounded-circle" style="width:150px;height:150px;" />
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">昵称</label>
                         <input type="text" name="nickname" class="form-control"
-                               th:value="${user.nickname}" required/>
+                               th:value="${user.nickname}" required />
                     </div>
 
                     <div class="mb-4">
@@ -292,15 +294,15 @@
 
                     <div class="mb-4">
                         <label class="form-label">当前密码</label>
-                        <input type="password" name="oldPassword" class="form-control" required/>
+                        <input type="password" name="oldPassword" class="form-control" required />
                     </div>
                     <div class="mb-4">
                         <label class="form-label">新密码</label>
-                        <input type="password" name="newPassword" class="form-control" required/>
+                        <input type="password" name="newPassword" class="form-control" required />
                     </div>
                     <div class="mb-4">
                         <label class="form-label">确认新密码</label>
-                        <input type="password" name="confirmPassword" class="form-control" required/>
+                        <input type="password" name="confirmPassword" class="form-control" required />
                     </div>
 
                     <div class="btn-group">
@@ -321,7 +323,8 @@
                     <ul class="article-list">
                         <li th:each="a : ${publishedArticles}">
                             <a th:href="@{/articles/{id}(id=${a.id})}" th:text="${a.title}"></a>
-                            <small class="text-muted" th:text="${#temporals.format(a.createdAt, 'yyyy-MM-dd')}"></small>
+                            <small class="text-muted"
+                                   th:text="${#dates.format(a.createdAt, 'yyyy-MM-dd')}"></small>
                         </li>
                         <li th:if="${#lists.isEmpty(publishedArticles)}">
                             <span class="text-muted">暂无已发布内容</span>
@@ -365,7 +368,7 @@
     $(function(){
         $('#avatarInput').on('change', function(){
             const file = this.files[0];
-            if(!file) return $('#previewBox').hide();
+            if (!file) return $('#previewBox').hide();
             const reader = new FileReader();
             reader.onload = e => {
                 $('#previewAvatar').attr('src', e.target.result);
@@ -387,15 +390,16 @@
                 processData: false,
                 headers: {'X-Requested-With':'XMLHttpRequest'},
                 success(res) {
-                    if(res.success) {
+                    if (res.success) {
                         $('#msgBox').html('<div class="alert alert-success">个人信息更新成功！</div>');
                         $('#previewBox').hide();
-
+                        // 把表单里的头像直接换成新 URL
+                        $('img.rounded-circle').attr('src', res.avatar_url);
                         setTimeout(function() {
                             location.reload();
                         }, 1000);
                     } else {
-                        $('#msgBox').html('<div class="alert alert-danger">更新失败：'+ (res.error||'未知错误') +'</div>');
+                        $('#msgBox').html('<div class="alert alert-danger">更新失败：' + (res.error || '未知错误') + '</div>');
                     }
                 },
                 error() {
