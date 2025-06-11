@@ -10,15 +10,18 @@ import java.nio.file.Paths;
 public class WebConfig implements WebMvcConfigurer {
 
     @Value("${app.avatar.upload-dir}")
-    private String avatarUploadDir; // now "uploads/avatars"
+    private String avatarUploadDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String projectDir = System.getProperty("user.dir");
-        // 拼出绝对路径并保证末尾有斜杠
         String fullPath = Paths.get(projectDir, avatarUploadDir).toUri().toString() + "/";
 
         registry.addResourceHandler("/uploads/avatars/**")
                 .addResourceLocations(fullPath);
+
+        String fullImagePath = Paths.get(projectDir, "uploads/images").toUri().toString() + "/";
+        registry.addResourceHandler("/uploads/images/**")
+                .addResourceLocations(fullImagePath);
     }
 }

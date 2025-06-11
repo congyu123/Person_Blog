@@ -154,22 +154,43 @@
 
     tinymce.init({
         selector: '#editor-container',
+        language: 'zh_CN',
         height: 500,
         menubar: false,
         plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount','image'
+            'advlist','autolink','lists','link','image','charmap','preview',
+            'anchor','searchreplace','visualblocks','code','fullscreen',
+            'insertdatetime','media','table','help','wordcount'
         ],
-        toolbar: 'undo redo | blocks | bold italic backcolor | ' +
+        toolbar: 'undo redo | formatselect | bold italic backcolor | ' +
             'alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat | help',
+            'bullist numlist outdent indent | removeformat | image | help',
         content_style: 'body { font-family:Inter,sans-serif; font-size:16px }',
+
+        images_upload_handler: function(blobInfo, success, failure) {
+            const formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            return fetch('/api/upload-image', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(json => {
+                    if (!json.location) throw new Error('Invalid JSON');
+                    success(json.location);
+                })
+                .catch(err => {
+                    failure('上传失败: ' + err.message);
+                });
+        },
+
         setup: function(editor) {
             editor.on('change', function() {
                 updateWordCount(editor.getContent({format: 'text'}).length);
             });
-
             if (document.getElementById('autoSave').checked) {
                 editor.on('change', debounce(function() {
                     autoSaveDraft(editor.getContent());
@@ -177,13 +198,18 @@
             }
         },
         init_instance_callback: function(editor) {
-            const contentElement = document.querySelector('#editor-container div');
-            if (contentElement && contentElement.innerHTML) {
-                editor.setContent(contentElement.innerHTML);
-                updateWordCount(editor.getContent({format: 'text'}).length);
+            const contentEl = document.querySelector('#editor-container div');
+            if (contentEl && contentEl.innerHTML) {
+                editor.setContent(contentEl.innerHTML);
+                updateWordCount(editor.getContent({format:'text'}).length);
             }
         }
     });
+
+    document.querySelector('form').addEventListener('submit', () => {
+        document.getElementById('content').value = tinymce.activeEditor.getContent();
+    });
+
 
     document.querySelector('form').addEventListener('submit', function() {
         if (typeof tinymce !== 'undefined') {
@@ -239,7 +265,6 @@
         toastBody.className = 'toast-body';
         toastBody.textContent = message;
 
-        // 组装 Toast
         toastHeader.appendChild(icon);
         toastHeader.appendChild(title);
         toastHeader.appendChild(closeButton);
@@ -249,16 +274,13 @@
 
         toastContainer.appendChild(toastEl);
 
-        // 添加到页面
         document.body.appendChild(toastContainer);
 
-        // 初始化并显示 Toast
         const toast = new bootstrap.Toast(toastEl, {
             delay: 3000
         });
         toast.show();
 
-        // Toast 隐藏后移除元素
         toastEl.addEventListener('hidden.bs.toast', function() {
             document.body.removeChild(toastContainer);
         });

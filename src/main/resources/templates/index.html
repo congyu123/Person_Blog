@@ -122,9 +122,10 @@
             </select>
         </div>
         <div class="col-md-3">
-            <input type="text" name="tag" class="form-control"
-                   placeholder="标签"
-                   th:value="${selectedTag}" />
+            <input type="text" name="keyword" class="form-control"
+                   placeholder="标签或标题搜索"
+                   th:value="${keyword}" />
+
         </div>
         <div class="col-md-2">
             <select name="sortField" class="form-select">
@@ -160,7 +161,10 @@
                           th:if="${cat.id == article.categoryId}"
                           th:text="${cat.name}"></span>
                     &nbsp;|&nbsp;
-
+                    标签：
+                    <span th:each="t : ${#strings.arraySplit(article.tags, ',')}"
+                          class="badge bg-secondary me-1"
+                          th:text="${t}"></span>
 
 
                 </div>

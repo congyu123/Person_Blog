@@ -4,9 +4,11 @@ package com.cy.person_blog.controller;
 import com.cy.person_blog.entity.Article;
 import com.cy.person_blog.entity.Category;
 import com.cy.person_blog.entity.Comment;
+import com.cy.person_blog.entity.Favorite;
 import com.cy.person_blog.service.ArticleService;
 import com.cy.person_blog.service.CategoryService;
 import com.cy.person_blog.service.CommentService;
+import com.cy.person_blog.service.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,8 @@ public class ArticleController {
     @Autowired private CategoryService categoryService;
     @Autowired
     private CommentService commentService;
+    @Autowired  private FavoriteService favoriteService;
+
 
     @GetMapping
     public String redirectToNew() {
@@ -61,16 +65,13 @@ public class ArticleController {
     @GetMapping("/{id}")
     public String viewArticleDetail(
             @PathVariable("id") Integer id,
-            Model model
+            Model model,
+            HttpSession session
     ) {
         Article article = articleService.getPublishedArticleById(id);
-
         articleService.addViewCount(id);
-
         List<Comment> comments = commentService.listCommentsByArticleId(id);
-
         List<Category> categories = categoryService.listAllCategories();
-
         List<Article> related = articleService.listRelatedArticles(id, 5);
 
         model.addAttribute("article", article);
@@ -79,11 +80,72 @@ public class ArticleController {
         model.addAttribute("relatedArticles", related);
         model.addAttribute("newComment", new Comment());
 
+        Object currentUserObj = session.getAttribute("currentUser");
+        model.addAttribute("currentUser", currentUserObj);
+
+        if(currentUserObj != null) {
+            Integer userId = ((com.cy.person_blog.entity.User) currentUserObj).getId();
+            boolean liked = favoriteService.hasFavorite(userId, id, Favorite.FavoriteType.LIKE);
+            boolean favorited = favoriteService.hasFavorite(userId, id, Favorite.FavoriteType.FAVORITE);
+
+            long likeCount = favoriteService.countFavorites(id, Favorite.FavoriteType.LIKE);
+            long favoriteCount = favoriteService.countFavorites(id, Favorite.FavoriteType.FAVORITE);
+
+            model.addAttribute("liked", liked);
+            model.addAttribute("favorited", favorited);
+            model.addAttribute("likeCount", likeCount);
+            model.addAttribute("favoriteCount", favoriteCount);
+        } else {
+            model.addAttribute("liked", false);
+            model.addAttribute("favorited", false);
+            model.addAttribute("likeCount", favoriteService.countFavorites(id, Favorite.FavoriteType.LIKE));
+            model.addAttribute("favoriteCount", favoriteService.countFavorites(id, Favorite.FavoriteType.FAVORITE));
+        }
+
         return "article_detail";
     }
+
     @PostMapping("/comment")
     public String postComment(@ModelAttribute("newComment") Comment comment) {
         commentService.addComment(comment);
         return "redirect:/articles/" + comment.getArticleId();
     }
+    @PostMapping("/{id}/like")
+    @ResponseBody
+    public String toggleLike(@PathVariable Integer id, HttpSession session) {
+        Object currentUserObj = session.getAttribute("currentUser");
+        if (currentUserObj == null) {
+            return "error:not_logged_in";
+        }
+        Integer userId = ((com.cy.person_blog.entity.User) currentUserObj).getId();
+
+        boolean hasLiked = favoriteService.hasFavorite(userId, id, Favorite.FavoriteType.LIKE);
+        if (hasLiked) {
+            favoriteService.removeFavorite(userId, id, Favorite.FavoriteType.LIKE);
+        } else {
+            favoriteService.addFavorite(userId, id, Favorite.FavoriteType.LIKE);
+        }
+        long likeCount = favoriteService.countFavorites(id, Favorite.FavoriteType.LIKE);
+        return String.valueOf(likeCount);
+    }
+
+    @PostMapping("/{id}/favorite")
+    @ResponseBody
+    public String toggleFavorite(@PathVariable Integer id, HttpSession session) {
+        Object currentUserObj = session.getAttribute("currentUser");
+        if (currentUserObj == null) {
+            return "error:not_logged_in";
+        }
+        Integer userId = ((com.cy.person_blog.entity.User) currentUserObj).getId();
+
+        boolean hasFav = favoriteService.hasFavorite(userId, id, Favorite.FavoriteType.FAVORITE);
+        if (hasFav) {
+            favoriteService.removeFavorite(userId, id, Favorite.FavoriteType.FAVORITE);
+        } else {
+            favoriteService.addFavorite(userId, id, Favorite.FavoriteType.FAVORITE);
+        }
+        long favCount = favoriteService.countFavorites(id, Favorite.FavoriteType.FAVORITE);
+        return String.valueOf(favCount);
+    }
+
 }

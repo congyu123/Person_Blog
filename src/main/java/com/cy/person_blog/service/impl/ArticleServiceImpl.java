@@ -53,16 +53,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<Article> listPublishedArticles(int page, int size, String sortField, String sortDir, Integer categoryId, String tagKeyword) {
+    public Page<Article> listPublishedArticles(int page, int size, String sortField, String sortDir, Integer categoryId, String keyword) {
         Pageable pageable = PageRequest.of(page - 1, size,
                 sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending());
 
-        String tagParam = (tagKeyword == null || tagKeyword.trim().isEmpty()) ? null : tagKeyword.trim();
+        String key = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
         Integer catParam = (categoryId == null || categoryId == 0) ? null : categoryId;
 
-        return articleRepo.findByStatusAndOptionalCategoryIdAndTag(Article.Status.PUBLISHED, catParam, tagParam, pageable);
+        return articleRepo.findByStatusAndOptionalCategoryIdAndKeyword(Article.Status.PUBLISHED, catParam, key, pageable);
     }
+
 
 
     @Override

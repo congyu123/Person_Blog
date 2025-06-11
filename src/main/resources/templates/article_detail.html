@@ -42,14 +42,25 @@
                 <hr />
                 <!-- 点赞/收藏/举报按钮演示 -->
                 <div class="d-flex justify-content-between">
-                    <div>
-                        <button class="btn btn-outline-primary me-2">
-                            <i class="bi bi-hand-thumbs-up"></i> 点赞
-                        </button>
-                        <button class="btn btn-outline-danger">
-                            <i class="bi bi-bookmark"></i> 收藏
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button id="likeBtn"
+                                    class="btn btn-outline-primary me-2"
+                                    th:classappend="${liked} ? 'active' : ''">
+                                <i class="bi bi-hand-thumbs-up"></i> 点赞 (<span id="likeCount" th:text="${likeCount}">0</span>)
+                            </button>
+
+                            <button id="favoriteBtn"
+                                    class="btn btn-outline-danger"
+                                    th:classappend="${favorited} ? 'active' : ''">
+                                <i class="bi bi-bookmark"></i> 收藏 (<span id="favoriteCount" th:text="${favoriteCount}">0</span>)
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-flag"></i> 举报
                         </button>
                     </div>
+
                     <button class="btn btn-outline-secondary">
                         <i class="bi bi-flag"></i> 举报
                     </button>
@@ -135,7 +146,8 @@
                     <div class="reply-form-container ms-5 mb-4" th:attr="data-for=${comment.id}" style="display: none;">
                         <form th:action="@{/articles/comment}" method="post">
                             <input type="hidden" name="articleId" th:value="${article.id}" />
-                            <input type="hidden" name="userId" th:value="${#httpSession.getAttribute('currentUser').id}" />
+                            <input type="hidden" name="userId" th:value="${currentUser != null ? currentUser.id : 0}" />
+
                             <!-- 这里 parentId 会由 JS 动态填入 -->
                             <input type="hidden" name="parentId" />
                             <div class="mb-2">
@@ -157,7 +169,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-<script>
+<script th:inline="javascript">
     // 等页面加载完成后再绑定事件
     document.addEventListener('DOMContentLoaded', function() {
         // 为每个“回复”按钮注册点击事件
@@ -185,6 +197,34 @@
                 }
             });
         });
+    });
+    var articleId = [[${article.id}]];
+    var contextPath = /*[[@{/}]]*/ "";
+
+    document.getElementById("likeBtn").addEventListener("click", function () {
+        fetch(contextPath + "articles/" + articleId + "/like", {method: "POST"})
+            .then(res => res.text())
+            .then(data => {
+                if (data.startsWith("error")) {
+                    alert("请先登录！");
+                    return;
+                }
+                document.getElementById("likeCount").textContent = data;
+                this.classList.toggle("active");
+            });
+    });
+
+    document.getElementById("favoriteBtn").addEventListener("click", function () {
+        fetch(contextPath + "articles/" + articleId + "/favorite", {method: "POST"})
+            .then(res => res.text())
+            .then(data => {
+                if (data.startsWith("error")) {
+                    alert("请先登录！");
+                    return;
+                }
+                document.getElementById("favoriteCount").textContent = data;
+                this.classList.toggle("active");
+            });
     });
 </script>
 

@@ -35,5 +35,12 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
                                                           @Param("categoryId") Integer categoryId,
                                                           @Param("tag") String tag,
                                                           Pageable pageable);
+    @Query("select a from Article a where a.status = :status "
+            + "and (:categoryId is null or a.categoryId = :categoryId) "
+            + "and (:keyword is null or (a.tags like %:keyword% or a.title like %:keyword%))")
+    Page<Article> findByStatusAndOptionalCategoryIdAndKeyword(@Param("status") Status status,
+                                                              @Param("categoryId") Integer categoryId,
+                                                              @Param("keyword") String keyword,
+                                                              Pageable pageable);
 
 }
