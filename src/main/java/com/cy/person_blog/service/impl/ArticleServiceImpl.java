@@ -115,5 +115,6 @@ public class ArticleServiceImpl implements ArticleService {
 
         return sorted.size() <= topCount ? sorted : sorted.subList(0, topCount);
     }
+
 }
 

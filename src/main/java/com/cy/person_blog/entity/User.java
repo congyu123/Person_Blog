@@ -30,6 +30,16 @@ public class User {
     @Column(name = "avatar_url",nullable = false)
     private String avatar_url;
 
+    @Column(name = "follower_count", nullable = false)
+    private Integer followerCount = 0;
+
+    public Integer getFollowerCount() {
+        return followerCount;
+    }
+    public void setFollowerCount(Integer followerCount) {
+        this.followerCount = followerCount;
+    }
+
     public String getBio() {
         return bio;
     }

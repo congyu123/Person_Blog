@@ -6,229 +6,107 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background-color: #f8f9fa;
-            padding-top: 2rem;
-            font-size: 1.05rem;
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f6fa;
+            padding-top: 2.5rem;
+            font-size: 1.06rem;
+            color: #222;
         }
-
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-        }
-
         .profile-container {
-            max-width: 1200px;
+            max-width: 1260px;
             margin: auto;
-            padding: 0 20px;
+            padding: 0 22px 32px;
         }
-
-        .card-grid {
+        h2 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #363f5c;
+            margin: 1rem 0 2rem;
+        }
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.8rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: 380px 1fr;
+            gap: 2.2rem;
         }
-
         .card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 6px 32px rgba(60,72,88,0.09);
             border: none;
-            transition: transform 0.3s;
+            margin-bottom: 1.8rem;
+            transition: box-shadow 0.2s;
         }
-
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(30,34,50,0.14);
         }
-
         .card-header {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-            font-size: 1.35rem;
-            font-weight: 600;
-            padding: 1.2rem 1.8rem;
-            border: none;
+            background: linear-gradient(135deg,#6c757d,#495057 70%);
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding: 1.1rem 1.7rem;
+            border-radius: 20px 20px 0 0;
         }
-
         .card-body {
-            padding: 1.8rem;
+            padding: 2.2rem 1.7rem 1.8rem;
         }
+        .profile-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+        .avatar-section { text-align: center; margin-bottom: 1.7rem; }
+        .rounded-circle { width: 124px; height: 124px; border: 4px solid #ececec; }
+        .form-label { font-weight: 700; }
+        .btn-group { display: flex; justify-content: flex-end; gap: 1.2rem; }
+        .btn { border-radius: 22px; font-weight: 700; padding: 0.72rem 2rem; }
+        .btn-primary { background: #3e7bfd; color: #fff; }
+        .btn-warning { background: #ffc107; }
 
-        .avatar-section {
+        /* New compact stats-chart layout */
+        .flex-stats-chart {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stats-summary {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 1.2rem 0;
-            margin-bottom: 1.5rem;
+            gap: 1.1rem;
+            flex: 0 0 140px;
         }
-
-        .rounded-circle {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border: 4px solid #e9ecef;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .form-label {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-            color: #343a40;
-        }
-
-        .form-control {
-            font-size: 1.1rem;
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            border: 2px solid #ced4da;
-        }
-
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.25rem rgba(0,123,255,0.25);
-        }
-
-        .btn {
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding: 0.9rem 1.8rem;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            min-width: 160px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #0b5ed7, #0a58ca);
-            box-shadow: 0 6px 12px rgba(13,110,253,0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
-            color: #212529;
-        }
-
-        .btn-warning:hover {
-            background: linear-gradient(135deg, #e0a800, #d39e00);
-            box-shadow: 0 6px 12px rgba(255,193,7,0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-sm {
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
-            min-width: auto;
-        }
-
-        .articles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.8rem;
-            margin-top: 1.5rem;
-        }
-
-        .article-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-        }
-
-        .article-section h5 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 2px solid #dee2e6;
-            color: #495057;
-        }
-
-        .article-list {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 0;
-        }
-
-        .article-list li {
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1rem;
-        }
-
-        .article-list li:last-child {
-            border-bottom: none;
-        }
-
-        .badge {
-            font-size: 1rem;
-            padding: 0.4em 0.8em;
-            border-radius: 50px;
-        }
-
-        .alert {
-            font-size: 1.1rem;
-            padding: 1rem;
-            border-radius: 12px;
-        }
-
-        .preview-box {
+        .stat-card {
+            background: #f7f9fb;
+            border-radius: 14px;
+            padding: 0.9rem 0.7rem;
             text-align: center;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin: 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(90,110,160,0.04);
         }
+        .stat-value { font-size: 1.23rem; font-weight: 700; }
+        .stat-label { font-size: 0.98rem; color: #6b7683; }
 
-        .btn-group {
+        .chart-container {
+            flex: 1;
+            background: #f9fbff;
+            border-radius: 13px;
+            padding: 0.8rem;
+            box-shadow: 0 1px 6px rgba(62,90,250,0.04);
+            height: 180px;
             display: flex;
-            gap: 1.2rem;
-            margin-top: 1.8rem;
-            justify-content: center;
+            flex-direction: column;
         }
+        .chart-title { font-size: 0.99rem; font-weight: 600; margin-bottom: 0.3rem; }
+        #interactionChart { flex: 1; }
 
-        @media (max-width: 768px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
+        .articles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px,1fr)); gap: 1.8rem; }
+        .article-section { background: #fff; border-radius: 14px; padding: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .article-section h5 { font-size: 1.08rem; margin-bottom: 1rem; }
+        .article-list li { padding: 0.95rem 0; border-bottom: 1px solid #f0f0f5; }
 
-            .articles-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .rounded-circle {
-                width: 120px;
-                height: 120px;
-            }
-
-            .btn {
-                font-size: 1.1rem;
-                padding: 0.8rem 1.5rem;
-                min-width: 140px;
-            }
-
-            .card-body {
-                padding: 1.5rem;
-            }
+        @media (max-width:900px) {
+            .flex-stats-chart { flex-direction: column; }
+            .stats-summary { flex-direction: row; justify-content: space-between; }
+            .chart-container { width:100%; }
         }
     </style>
 </head>
@@ -248,10 +126,7 @@
                     <div id="msgBox"></div>
 
                     <div class="avatar-section">
-                        <!-- 使用 controller 里算好的 userAvatarUrl -->
-                        <img th:src="@{${userAvatarUrl}}"
-                        alt="头像" class="rounded-circle mb-3" />
-
+                        <img th:src="@{${userAvatarUrl}}" alt="头像" class="rounded-circle mb-3" />
                         <div class="mb-3 w-100">
                             <label class="form-label">更换头像</label>
                             <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*" />
@@ -273,10 +148,17 @@
 
                     <div class="mb-4">
                         <label class="form-label">个人简介</label>
-                        <textarea name="bio" rows="4" class="form-control"
-                                  th:text="${user.bio}"></textarea>
+                        <textarea name="bio" rows="4" class="form-control" th:text="${user.bio}"></textarea>
                     </div>
-
+                    <div class="stat-card">
+                        <div class="stat-value" th:text="${followerCount}">0</div>
+                        <div class="stat-label">粉丝</div>
+                    </div>
+                    <!-- 新增：关注 -->
+                    <div class="stat-card">
+                        <div class="stat-value" th:text="${followingCount}">0</div>
+                        <div class="stat-label">关注</div>
+                    </div>
                     <div class="btn-group">
                         <button type="submit" class="btn btn-primary">保存信息</button>
                     </div>
@@ -315,16 +197,27 @@
 
     <!-- 文章管理卡片 -->
     <div class="card">
-        <div class="card-header">内容管理</div>
-        <div class="card-body">
+
+            <div class="card-header">内容管理</div>
+            <div class="card-body">
+                <div class="flex-stats-chart">
+                    <div class="stats-summary">
+                        <div class="stat-card"><div class="stat-value like" th:text="${likeCount}">0</div><div class="stat-label">点赞</div></div>
+                        <div class="stat-card"><div class="stat-value favorite" th:text="${favoriteCount}">0</div><div class="stat-label">收藏</div></div>
+                        <div class="stat-card"><div class="stat-value view" th:text="${viewCount}">0</div><div class="stat-label">浏览</div></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">近7天趋势</div>
+                        <canvas id="interactionChart"></canvas>
+                    </div>
+                </div>
             <div class="articles-grid">
                 <div class="article-section">
                     <h5>已发布</h5>
                     <ul class="article-list">
                         <li th:each="a : ${publishedArticles}">
                             <a th:href="@{/articles/{id}(id=${a.id})}" th:text="${a.title}"></a>
-                            <small class="text-muted"
-                                   th:text="${#dates.format(a.createdAt, 'yyyy-MM-dd')}"></small>
+                            <small class="text-muted" th:text="${#dates.format(a.createdAt, 'yyyy-MM-dd')}"></small>
                         </li>
                         <li th:if="${#lists.isEmpty(publishedArticles)}">
                             <span class="text-muted">暂无已发布内容</span>
@@ -350,8 +243,7 @@
                     <ul class="article-list">
                         <li th:each="a : ${draftArticles}">
                             <span th:text="${a.title}"></span>
-                            <a th:href="@{/articles/edit/{id}(id=${a.id})}"
-                               class="btn btn-sm btn-outline-primary">编辑</a>
+                            <a th:href="@{/articles/edit/{id}(id=${a.id})}" class="btn btn-sm btn-outline-primary">编辑</a>
                         </li>
                         <li th:if="${#lists.isEmpty(draftArticles)}">
                             <span class="text-muted">暂无草稿</span>
@@ -362,6 +254,7 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
 
 <script th:src="@{/js/bootstrap.min.js}"></script>
 <script>
@@ -393,7 +286,6 @@
                     if (res.success) {
                         $('#msgBox').html('<div class="alert alert-success">个人信息更新成功！</div>');
                         $('#previewBox').hide();
-                        // 把表单里的头像直接换成新 URL
                         $('img.rounded-circle').attr('src', res.avatar_url);
                         setTimeout(function() {
                             location.reload();
@@ -407,6 +299,131 @@
                 }
             });
         });
+
+        // 折线图实现
+        const ctx = document.getElementById('interactionChart').getContext('2d');
+        let interactionChart;
+        let currentPeriod = 'week';
+
+        // 初始化图表
+        function initChart(labels, likes, favorites, views) {
+            if (interactionChart) {
+                interactionChart.destroy();
+            }
+
+            interactionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '点赞数',
+                            data: likes,
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '收藏数',
+                            data: favorites,
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '浏览量',
+                            data: views,
+                            borderColor: '#fd7e14',
+                            backgroundColor: 'rgba(253, 126, 20, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        // 加载统计数据
+        function loadChartData(period) {
+            $('.chart-btn').removeClass('active');
+            $(`.chart-btn[data-period="${period}"]`).addClass('active');
+
+            // 显示加载状态
+            $('#interactionChart').hide();
+            $('.chart-container').append('<div id="chartLoading" class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">加载数据中...</p></div>');
+
+            $.ajax({
+                url: '/personblog/profile/stats?days=7',
+                type: 'GET',
+                success: function(res) {
+                    if (res.success) {
+                        const data = res.data;
+                        initChart(data.labels, data.likes, data.favorites, data.views);
+                        currentPeriod = period;
+                    } else {
+                        alert('加载数据失败: ' + res.error);
+                    }
+                },
+                error: function() {
+                    alert('服务器连接错误，请稍后重试');
+                },
+                complete: function() {
+                    $('#chartLoading').remove();
+                    $('#interactionChart').show();
+                }
+            });
+        }
+
+        // 初始加载数据
+        loadChartData(7);
+
+
     });
 </script>
 </body>

@@ -1,14 +1,8 @@
 // ArticleController.java
 package com.cy.person_blog.controller;
 
-import com.cy.person_blog.entity.Article;
-import com.cy.person_blog.entity.Category;
-import com.cy.person_blog.entity.Comment;
-import com.cy.person_blog.entity.Favorite;
-import com.cy.person_blog.service.ArticleService;
-import com.cy.person_blog.service.CategoryService;
-import com.cy.person_blog.service.CommentService;
-import com.cy.person_blog.service.FavoriteService;
+import com.cy.person_blog.entity.*;
+import com.cy.person_blog.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,19 +18,25 @@ import java.util.List;
 @RequestMapping("/articles")
 public class ArticleController {
 
-    @Autowired private ArticleService articleService;
-    @Autowired private CategoryService categoryService;
+    @Autowired
+    private ArticleService articleService;
+    @Autowired
+    private CategoryService categoryService;
     @Autowired
     private CommentService commentService;
-    @Autowired  private FavoriteService favoriteService;
-
-
+    @Autowired
+    private FavoriteService favoriteService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ArticleViewStatService viewStatService;
+    @Autowired
+    private FollowService followService;
     @GetMapping
     public String redirectToNew() {
         return "redirect:/articles/new";
     }
 
-    // 新增/编辑表单
     @GetMapping({"/new", "/edit/{id}"})
     public String form(@PathVariable(required = false) Integer id,
                        Model model, HttpSession session) {
@@ -49,7 +49,6 @@ public class ArticleController {
         return "publish_article";
     }
 
-    // 保存（包括草稿箱和发布）
     @PostMapping("/save")
     public String save(@ModelAttribute Article article,
                        @RequestParam String action,
@@ -68,6 +67,7 @@ public class ArticleController {
             Model model,
             HttpSession session
     ) {
+        viewStatService.recordView(id);
         Article article = articleService.getPublishedArticleById(id);
         articleService.addViewCount(id);
         List<Comment> comments = commentService.listCommentsByArticleId(id);
@@ -82,7 +82,19 @@ public class ArticleController {
 
         Object currentUserObj = session.getAttribute("currentUser");
         model.addAttribute("currentUser", currentUserObj);
+        User author = userService.findById(article.getAuthorId());
+        model.addAttribute("author", author);
 
+        Object cu = session.getAttribute("currentUser");
+        boolean isFollowing = false;
+        if (cu != null) {
+            Integer currentUserId = ((User) cu).getId();
+            isFollowing = followService.isFollowing(currentUserId, author.getId());
+        }
+        model.addAttribute("isFollowing", isFollowing);
+
+        long followerCount = followService.getFollowerCount(author.getId());
+        model.addAttribute("followerCount", followerCount);
         if(currentUserObj != null) {
             Integer userId = ((com.cy.person_blog.entity.User) currentUserObj).getId();
             boolean liked = favoriteService.hasFavorite(userId, id, Favorite.FavoriteType.LIKE);

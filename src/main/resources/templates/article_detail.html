@@ -15,6 +15,19 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h1 th:text="${article.title}">文章标题</h1>
+                <div class="author-info d-flex align-items-center mb-3">
+                    <img th:src="@{/uploads/avatars/{img}(img=${author.avatar_url})}" class="rounded-circle me-3" width="50" height="50" alt="头像"/>
+                    <div>
+                        <h6 th:text="${author.nickname}"></h6>
+                        <small>粉丝：<span id="followerCount" th:text="${author.followerCount}"></span></small>
+                    </div>
+                    <button id="followBtn"
+                            th:data-url="@{/users/{id}/follow(id=${author.id})}"
+                            class="btn btn-sm ms-auto"
+                            th:classappend="${isFollowing} ? 'btn-secondary' : 'btn-outline-primary'">
+                        <span th:text="${isFollowing} ? '已关注' : '关注'">关注</span>
+                    </button>
+                </div>
                 <div class="text-muted mb-3">
                     发布于：
                     <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}">2025-05-28 10:00</span>
@@ -226,6 +239,23 @@
                 this.classList.toggle("active");
             });
     });
+
+    document.getElementById('followBtn').addEventListener('click', function(){
+        const url = this.getAttribute('data-url');
+        fetch(url, { method: 'POST' })
+            .then(res => res.text())
+            .then(cnt => {
+                if (cnt.startsWith('error')) {
+                    alert('请先登录');
+                    return;
+                }
+                document.getElementById('followerCount').textContent = cnt;
+                this.textContent = this.textContent === '关注' ? '已关注' : '关注';
+                this.classList.toggle('btn-secondary');
+                this.classList.toggle('btn-outline-primary');
+            });
+    });
+
 </script>
 
 </html>
