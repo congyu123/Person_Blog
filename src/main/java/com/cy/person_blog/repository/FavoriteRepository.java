@@ -22,16 +22,20 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
 
     void deleteByUserIdAndArticleIdAndType(Integer userId, Integer articleId, FavoriteType type);
     // FavoriteRepository.java 新增查询方法
-    @Query("SELECT DATE(f.createdAt) AS date, COUNT(f) " +
-            "FROM Favorite f " +
-            "WHERE f.userId = :userId " +
-            "AND f.type = :type " +
-            "AND DATE(f.createdAt) BETWEEN :start AND :end " +
-            "GROUP BY DATE(f.createdAt) " +
-            "ORDER BY DATE(f.createdAt)")
-    List<Object[]> countDailyStatsByUserAndType(
-            @Param("userId") Integer userId,
-            @Param("type") FavoriteType type,
-            @Param("start") Date start,
-            @Param("end") Date end);
+    @Query("""
+      SELECT DATE(f.createdAt) AS date, COUNT(f)
+      FROM Favorite f
+      JOIN Article a ON f.articleId = a.id
+      WHERE a.authorId = :authorId
+        AND f.type = :type
+        AND DATE(f.createdAt) BETWEEN :start AND :end
+      GROUP BY DATE(f.createdAt)
+      ORDER BY DATE(f.createdAt)
+      """)
+    List<Object[]> countDailyStatsByAuthorAndType(
+            @Param("authorId") Integer authorId,
+            @Param("type")       Favorite.FavoriteType type,
+            @Param("start")      Date start,
+            @Param("end")        Date end
+    );
 }

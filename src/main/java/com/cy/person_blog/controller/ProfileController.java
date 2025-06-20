@@ -1,7 +1,6 @@
 package com.cy.person_blog.controller;
 
 import com.cy.person_blog.entity.Article;
-import com.cy.person_blog.entity.Favorite;
 import com.cy.person_blog.entity.User;
 import com.cy.person_blog.service.ArticleService;
 import com.cy.person_blog.service.FavoriteService;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDate;
 import java.util.*;
 
 @Controller

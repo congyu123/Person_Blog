@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +34,8 @@ public class ArticleController {
     private ArticleViewStatService viewStatService;
     @Autowired
     private FollowService followService;
+    @Autowired
+    private ReportService reportService;
     @GetMapping
     public String redirectToNew() {
         return "redirect:/articles/new";
@@ -159,5 +163,26 @@ public class ArticleController {
         long favCount = favoriteService.countFavorites(id, Favorite.FavoriteType.FAVORITE);
         return String.valueOf(favCount);
     }
+    @PostMapping("/{id}/report")
+    public String reportArticle(@PathVariable("id") Integer id,
+                                @RequestParam("reason") String reason,
+                                HttpSession session,
+                                RedirectAttributes ra) {
+        Object cu = session.getAttribute("currentUser");
+        if (cu == null) {
+            ra.addFlashAttribute("error", "请先登录后再举报");
+            return "redirect:/login";
+        }
+        Integer userId = ((com.cy.person_blog.entity.User) cu).getId();
 
+        Report rpt = new Report();
+        rpt.setReporterId(userId);
+        rpt.setTargetType(Report.TargetType.ARTICLE);
+        rpt.setTargetId(id);
+        rpt.setReason(reason);
+        reportService.addReport(rpt);
+
+        ra.addFlashAttribute("message", "举报已提交，感谢您的反馈");
+        return "redirect:/articles/" + id;
+    }
 }

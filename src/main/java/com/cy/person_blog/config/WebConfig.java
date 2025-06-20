@@ -20,8 +20,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/avatars/**")
                 .addResourceLocations(fullPath);
 
-        String fullImagePath = Paths.get(projectDir, "uploads/images").toUri().toString() + "/";
-        registry.addResourceHandler("/uploads/images/**")
-                .addResourceLocations(fullImagePath);
+
     }
 }

@@ -53,8 +53,15 @@ public class UserController {
             return "login";
         }
 
-        session.setAttribute("currentUser", userOpt.get());
-        return "redirect:/";
+        User current = userOpt.get();
+        session.setAttribute("currentUser", current);
+
+        // 如果是管理员，跳转到 /admin，否则跳转到首页 /
+        if (Boolean.TRUE.equals(current.getAdmin())) {
+            return "redirect:/admin";
+        } else {
+            return "redirect:/";
+        }
     }
 
 

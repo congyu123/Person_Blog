@@ -4,6 +4,31 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<style>
+    .hover-link:hover {
+        color: #fff !important;
+        transition: color 0.3s ease;
+    }
+
+    .social-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #adb5bd;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .social-icon:hover {
+        background-color: var(--bs-primary);
+        color: white;
+        transform: translateY(-3px);
+    }
+</style>
 <body>
 <footer class="bg-dark text-white py-5">
     <div class="container">
@@ -30,33 +55,9 @@
             <p class="mb-0">&copy; 2025 博客平台 版权所有</p>
         </div>
     </div>
+    </div>
 </footer>
 
-<!-- 添加自定义样式 -->
-<style>
-    .hover-link:hover {
-        color: #fff !important;
-        transition: color 0.3s ease;
-    }
-    
-    .social-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.1);
-        color: #adb5bd;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .social-icon:hover {
-        background-color: var(--bs-primary);
-        color: white;
-        transform: translateY(-3px);
-    }
-</style>
+
 </body>
 </html>

@@ -88,31 +88,27 @@ public class FavoriteServiceImpl implements FavoriteService {
                 startDate = endDate.minusDays(6);
         }
 
-        // 获取日期标签
         List<String> labels = new ArrayList<>();
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             labels.add(date.format(DateTimeFormatter.ofPattern("MM-dd")));
         }
         stats.put("labels", labels);
 
-        // 获取点赞数据
         List<Long> likes = getDailyStats(userId, "LIKE", startDate, endDate);
         stats.put("likes", likes);
 
-        // 获取收藏数据
         List<Long> favorites = getDailyStats(userId, "FAVORITE", startDate, endDate);
         stats.put("favorites", favorites);
 
-        // 获取浏览数据
         List<Long> views = getDailyViewStats(userId, startDate, endDate);
         stats.put("views", views);
 
         return stats;
     }
 
-    private List<Long> getDailyStats(Integer userId, String type, LocalDate startDate, LocalDate endDate) {
-        List<Object[]> results = favoriteRepository.countDailyStatsByUserAndType(
-                userId,
+    private List<Long> getDailyStats(Integer authorId, String type, LocalDate startDate, LocalDate endDate) {
+        List<Object[]> results = favoriteRepository.countDailyStatsByAuthorAndType(
+                authorId,
                 FavoriteType.valueOf(type),
                 Date.valueOf(startDate),
                 Date.valueOf(endDate)
@@ -138,7 +134,6 @@ public class FavoriteServiceImpl implements FavoriteService {
             } else {
                 throw new IllegalArgumentException("Unexpected date type: " + rawDate.getClass());
             }
-            // 第二列也可能是 BigInteger、Long、Integer，使用 Number 再转
             Number cnt = (Number) row[1];
             map.put(date, cnt == null ? 0L : cnt.longValue());
         }

@@ -59,4 +59,11 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     @Modifying
     @Query("UPDATE Article a SET a.viewCount = a.viewCount + 1 WHERE a.id = :articleId")
     void incrementViewCount(@Param("articleId") Integer articleId);
+    List<Article> findByStatus(Status status);
+    @Query("SELECT COALESCE(SUM(a.viewCount),0) FROM Article a")
+    Long sumViewCount();
+    @Modifying
+    @Query("UPDATE Article a SET a.status = :status WHERE a.id = :id")
+    int updateStatusById(@Param("id") Integer id,
+                         @Param("status") Article.Status status);
 }

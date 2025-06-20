@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="'处理举报 #' + ${report.id}">处理举报</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border: none; border-radius: 0.5rem; }
+        .card-header { background-color: #e9ecef; font-weight: 600; }
+        .action-btns button { min-width: 160px; }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">举报详情 #<span th:text="${report.id}">ID</span></h2>
+        <a class="btn btn-outline-secondary" th:href="@{/admin}">返回后台首页</a>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">举报信息</div>
+        <div class="card-body">
+            <p><strong>举报人：</strong> <span th:text="${reporter.nickname} + ' (ID:' + ${reporter.id} + ')'">昵称</span></p>
+            <p><strong>举报时间：</strong> <span th:text="${#temporals.format(report.createdAt,'yyyy-MM-dd HH:mm')}">时间</span></p>
+            <p><strong>举报理由：</strong> <span th:text="${report.reason}">理由</span></p>
+        </div>
+    </div>
+
+    <div th:if="${report.targetType.name()} == 'ARTICLE'" class="card mb-4 shadow-sm">
+        <div class="card-header">被举报文章详情</div>
+        <div class="card-body">
+            <h3 th:text="${targetArticle.title}">文章标题</h3>
+            <p class="text-muted mb-3">
+                作者ID：<span th:text="${targetArticle.authorId}">作者ID</span> |
+                发布于：<span th:text="${#dates.format(targetArticle.createdAt,'yyyy-MM-dd HH:mm')}">发布时间</span>
+            </p>
+            <div th:utext="${targetArticle.content}">文章内容...</div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3 action-btns">
+        <form th:action="@{'/admin/reports/'+${report.id}+'/handle'}" method="post">
+            <input type="hidden" name="valid" value="true"/>
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('确认下架该文章并标记举报已处理？');">
+                下架文章并处理
+            </button>
+        </form>
+        <form th:action="@{'/admin/reports/'+${report.id}+'/handle'}" method="post">
+            <input type="hidden" name="valid" value="false"/>
+            <button type="submit" class="btn btn-secondary"
+                    onclick="return confirm('确认忽略此举报并标记已处理？');">
+                举报不属实
+            </button>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
