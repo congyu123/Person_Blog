@@ -150,7 +150,7 @@
 <div th:insert="~{footer.html}"></div>
 
 
-<script>
+<script th:inline="javascript">
 
     tinymce.init({
         selector: '#editor-container',
@@ -167,24 +167,25 @@
             'bullist numlist outdent indent | removeformat | image | help',
         content_style: 'body { font-family:Inter,sans-serif; font-size:16px }',
 
-        images_upload_handler: function(blobInfo, success, failure) {
-            const formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename());
-            return fetch('/api/upload-image', {
-                method: 'POST',
-                body: formData
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    return res.json();
+        images_upload_handler: function(blobInfo, progress) {
+            return new Promise(function(resolve, reject) {
+                const fd = new FormData();
+                fd.append('file', blobInfo.blob(), blobInfo.filename());
+
+                fetch(/*[[@{/api/upload-image}]]*/, {
+                    method: 'POST',
+                    body: fd
                 })
-                .then(json => {
-                    if (!json.location) throw new Error('Invalid JSON');
-                    success(json.location);
-                })
-                .catch(err => {
-                    failure('上传失败: ' + err.message);
-                });
+                    .then(res => {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.json();
+                    })
+                    .then(json => {
+                        if (json.location) resolve(json.location);
+                        else reject(json.error || '上传失败');
+                    })
+                    .catch(err => reject('上传失败: ' + err.message));
+            });
         },
 
         setup: function(editor) {
