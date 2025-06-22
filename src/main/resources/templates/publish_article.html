@@ -17,18 +17,133 @@
     <script src="https://cdn.tiny.cloud/1/06mgxbb0gy55nbt4wovgzw4rfznjs93dlm4jwkrupfcubr9o/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
     <style>
+        <style>
+        body {
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(120deg,#f3f8ff 70%, #e4e2ff 100%);
+            padding-top: 2.5rem;
+            font-size: 1.06rem;
+            color: #222;
+            min-height: 100vh;
+        }
+        main.container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(84,130,255,0.07), 0 2px 4px rgba(36,44,63,0.04);
+            padding: 40px 36px 28px 36px;
+            margin-bottom: 40px;
+            margin-top: 32px;
+        }
+        h1.display-4 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #2367ff;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h1.display-4::before {
+            content: "\f044";
+            font-family: "FontAwesome";
+            color: #7985f8;
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        .text-muted {
+            color: #6c7683 !important;
+        }
+        .bg-white {
+            background: #f9fbff !important;
+        }
+        .shadow {
+            box-shadow: 0 2px 12px rgba(110,130,255,0.04);
+        }
+        .rounded {
+            border-radius: 18px !important;
+        }
+        .form-label {
+            font-weight: 700;
+            color: #3255af;
+            font-size: 1.04rem;
+            letter-spacing: .5px;
+        }
+        .form-control, .form-select {
+            border-radius: 13px;
+            box-shadow: 0 1px 6px rgba(23,80,232,0.06);
+            border: 1px solid #e0e8ff;
+            font-size: 1.08rem;
+            transition: border 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3e7bfd;
+            box-shadow: 0 0 0 0.22rem rgba(62,123,253,0.17);
+            outline: none;
+        }
         .editor-shadow {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: #f6faff;
+            box-shadow: 0 4px 16px rgba(100,120,210,0.07);
+            border-radius: 14px;
+            border: 1.5px solid #eef2ff;
+            min-height: 350px;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            padding: 12px 14px;
+            transition: box-shadow 0.2s;
         }
-        .btn-hover:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
+        .editor-shadow:focus-within {
+            box-shadow: 0 8px 24px rgba(80,110,255,0.13);
+            border-color: #aac6ff;
         }
-        .form-control:focus {
-            border-color: #165DFF;
-            box-shadow: 0 0 0 0.2rem rgba(22,93,255,0.25);
+        .btn {
+            border-radius: 22px;
+            font-weight: 700;
+            font-size: 1.08rem;
+            padding: 0.75rem 2rem;
+            box-shadow: 0 2px 8px rgba(75,130,255,0.07);
+            transition: all 0.18s;
         }
+        .btn-primary {
+            background: linear-gradient(90deg,#3e7bfd,#857afd 85%);
+            border: none;
+        }
+        .btn-secondary {
+            background: linear-gradient(90deg,#c5d5fd 60%,#e4e9fc 100%);
+            color: #274fc7;
+            border: none;
+        }
+        .btn-outline-danger {
+            color: #f13c5d;
+            border-color: #f13c5d;
+        }
+        .btn-outline-danger:hover {
+            background: #f13c5d;
+            color: #fff;
+        }
+        .form-text {
+            color: #949fb4;
+            font-size: 0.99rem;
+        }
+        .modal-content {
+            border-radius: 22px;
+        }
+        /* 添加一点简单过渡动画 */
+        .form-control, .form-select, .editor-shadow, .btn {
+            transition: box-shadow 0.15s, border 0.15s, background 0.15s, color 0.15s;
+        }
+        /* 字数统计更突出 */
+        #wordCount {
+            font-weight: 700;
+            color: #2c69fc;
+            font-size: 1.15rem;
+        }
+        @media (max-width: 768px) {
+            main.container {padding: 16px 8px;}
+            .row > div {margin-bottom: 1rem;}
+        }
+    </style>
+
     </style>
 </head>
 <body class="bg-light">
@@ -103,14 +218,7 @@
                         <span id="wordCount">0</span> 字
                     </small>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <button type="button" id="previewBtn" class="btn btn-outline-secondary me-2">
-                        <i class="fa fa-eye me-1"></i> 预览
-                    </button>
-                    <button type="button" id="uploadImageBtn" class="btn btn-outline-secondary">
-                        <i class="fa fa-image me-1"></i> 上传图片
-                    </button>
-                </div>
+
             </div>
         </div>
 
@@ -305,11 +413,7 @@
         };
     }
 
-    // 上传图片按钮点击事件
-    document.getElementById('uploadImageBtn').addEventListener('click', function() {
-        // 这里只是模拟图片上传，实际项目中应该打开文件选择对话框或上传组件
-        alert('图片上传功能将在这里实现');
-    });
+
 </script>
 </body>
 </html>

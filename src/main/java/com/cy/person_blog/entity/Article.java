@@ -139,4 +139,23 @@ public class Article {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+    @Transient
+    private String firstImageUrl;
+
+    public String getFirstImageUrl() {
+        return firstImageUrl;
+    }
+    public void setFirstImageUrl(String firstImageUrl) {
+        this.firstImageUrl = firstImageUrl;
+    }
+    @Transient
+    private String summaryText;
+
+    public String getSummaryText() {
+        return summaryText;
+    }
+
+    public void setSummaryText(String summaryText) {
+        this.summaryText = summaryText;
+    }
 }

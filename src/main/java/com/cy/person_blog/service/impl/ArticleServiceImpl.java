@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,19 +53,56 @@ public class ArticleServiceImpl implements ArticleService {
     public Page<Article> findPublishedArticles(Pageable pageable) {
         return articleRepo.findByStatus(Article.Status.PUBLISHED, pageable);
     }
-
+    private static final Pattern IMG_PATTERN =
+            Pattern.compile("<img[^>]*src=[\"']([^\"']+)[\"'][^>]*>", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TAG_PATTERN =
+            Pattern.compile("(?s)<[^>]*>");
     @Override
-    public Page<Article> listPublishedArticles(int page, int size, String sortField, String sortDir, Integer categoryId, String keyword) {
-        Pageable pageable = PageRequest.of(page - 1, size,
-                sortDir.equalsIgnoreCase("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending());
+    public Page<Article> listPublishedArticles(int page, int size,
+                                               String sortField, String sortDir,
+                                               Integer categoryId, String keyword) {
 
-        String key = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Integer catParam = (categoryId == null || categoryId == 0) ? null : categoryId;
+        String key = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
 
-        return articleRepo.findByStatusAndOptionalCategoryIdAndKeyword(Article.Status.PUBLISHED, catParam, key, pageable);
+        Page<Article> pageData = articleRepo
+                .findByStatusAndOptionalCategoryIdAndKeyword(
+                        Article.Status.PUBLISHED, catParam, key, pageable);
+
+        for (Article art : pageData) {
+            String html = art.getContent();
+            if (html != null) {
+                // —— 提取首张图片 ——
+                Matcher imgM = IMG_PATTERN.matcher(html);
+                if (imgM.find()) {
+                    String raw = imgM.group(1);
+                    // "../uploads/…" → "/uploads/…"
+                    String normalized = raw.replaceAll("^\\.\\./+", "/");
+                    if (!normalized.startsWith("/")) {
+                        normalized = "/" + normalized;
+                    }
+                    art.setFirstImageUrl(normalized);
+                }
+
+                // —— 提取纯文字摘要 ——
+
+                String text = TAG_PATTERN.matcher(html).replaceAll("").trim();
+                if (!text.isEmpty()) {
+                    if (text.length() > 150) {
+                        text = text.substring(0, 150) + "...";
+                    }
+                    art.setSummaryText(text);
+                }
+            }
+        }
+
+        return pageData;
     }
-
 
 
     @Override
