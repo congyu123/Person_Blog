@@ -29,7 +29,12 @@ public class AdminController {
         model.addAttribute("pendingReports",  adminService.getPendingReports());
         model.addAttribute("users",           adminService.getNonAdminUsers());
         model.addAttribute("resolvedReports", adminService.getResolvedReports());
+        model.addAttribute("articleStats", adminService.getLast7DaysArticleCount());
+        model.addAttribute("commentStats", adminService.getLast7DaysCommentCount());
+        model.addAttribute("visitStats",   adminService.getLast7DaysVisitCount());
+        model.addAttribute("days",         adminService.getLast7DaysLabels());
         return "admin";
+
     }
     @GetMapping("/reports/{id}")
     public String reviewReport(@PathVariable("id") Integer reportId, Model model) {
@@ -74,4 +79,24 @@ public class AdminController {
         adminService.grantAdmin(id);
         return "redirect:/admin";
     }
+
+
+    @GetMapping("/articles/{id}/review")
+    public String reviewArticle(@PathVariable Integer id, Model model) {
+        Article article = articleService.findById(id);
+        if (article == null || article.getStatus() != Article.Status.PENDING) {
+            return "redirect:/admin";
+        }
+
+        // 处理内容图片路径
+        article.setContent(fixImageSrc(article.getContent()));
+        model.addAttribute("article", article);
+        return "admin_article_review";
+    }
+    public static String fixImageSrc(String content) {
+        if (content == null) return null;
+
+        return content.replaceAll("(<img[^>]+src=[\"'])(\\.{0,2}/)?uploads/", "$1/personblog/uploads/");
+    }
+
 }

@@ -4,6 +4,7 @@ package com.cy.person_blog.service.impl;
 import com.cy.person_blog.entity.Article;
 import com.cy.person_blog.entity.Article.Status;
 import com.cy.person_blog.repository.ArticleRepository;
+import com.cy.person_blog.repository.CommentRepository;
 import com.cy.person_blog.repository.FavoriteRepository;
 import com.cy.person_blog.service.ArticleService;
 import com.cy.person_blog.service.UserService;
@@ -14,6 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +32,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired private UserService userService;
     @Autowired private FavoriteRepository favoriteRepo;
 
+    @Autowired private CommentRepository commentRepo;
 
     @Override
     public List<Article> getByAuthorAndStatus(Integer authorId, Status status) {

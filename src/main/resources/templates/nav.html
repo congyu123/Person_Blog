@@ -1,70 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>博客平台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* 整体渐变背景 */
+        body { margin:0; padding:0; }
         .navbar {
-            background: linear-gradient(90deg, #343a40, #1d2124);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            padding: 0.75rem 1rem;
+            background: linear-gradient(90deg, #343a40 85%, #232629 100%);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+            padding: 0.75rem 0;
         }
-        /* 品牌文字 */
         .navbar-brand {
-            font-size: 1.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
             color: #ffc107 !important;
             transition: color .3s;
+            margin-right: 2rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
         .navbar-brand:hover {
-            color: #ffdd57 !important;
+            color: #ffe49b !important;
         }
-        /* 导航链接 */
-        .navbar-nav .nav-link {
-            color: rgba(255,255,255,0.85);
-            margin: 0 0.5rem;
+        /* 主导航按钮 */
+        .nav-main .nav-link, .nav-main .btn {
+            color: rgba(255,255,255,0.92) !important;
+            font-size: 1.09rem;
+            font-weight: 500;
+            margin: 0 0.28rem;
+            padding: 0.45rem 1.2rem;
+            border-radius: 1.3em;
+            background: transparent;
+            border: none;
             position: relative;
-            transition: color .3s;
+            transition: color .23s, background .22s;
         }
-        /* 下划线动画 */
-        .navbar-nav .nav-link::after {
+        .nav-main .nav-link.active, .nav-main .btn.active,
+        .nav-main .nav-link:focus, .nav-main .btn:focus {
+            color: #ffc107 !important;
+            background: rgba(255,193,7,0.08);
+        }
+        .nav-main .btn-publish {
+            background: linear-gradient(90deg,#ffc107 80%,#ffed86 100%) !important;
+            color: #232629 !important;
+            font-weight: 700;
+            border: none;
+            box-shadow: 0 2px 12px rgba(255,193,7,0.08);
+        }
+        .nav-main .btn-publish:hover {
+            background: linear-gradient(90deg,#ffe27c 60%,#ffc107 100%) !important;
+            color: #222 !important;
+        }
+        .nav-main .nav-link::after, .nav-main .btn::after {
             content: "";
             position: absolute;
-            height: 2px;
-            width: 0;
-            bottom: -4px;
-            left: 0;
+            left: 1.1em;
+            right: 1.1em;
+            bottom: 5px;
+            height: 2.3px;
             background: #ffc107;
-            transition: width .3s;
+            border-radius: 2px;
+            width: 0;
+            transition: width .29s;
         }
-        .navbar-nav .nav-link:hover {
-            color: #fff;
+        .nav-main .nav-link:hover::after, .nav-main .btn:hover::after,
+        .nav-main .nav-link.active::after, .nav-main .btn.active::after {
+            width: 70%;
         }
-        .navbar-nav .nav-link:hover::after {
-            width: 100%;
+
+        /* 用户头像和昵称 */
+        .user-profile {
+            display: flex;
+            align-items: center;
         }
-        /* 当前激活页 */
-        .navbar-nav .active > .nav-link {
-            color: #ffc107 !important;
+        .user-profile img {
+            width: 36px; height: 36px; object-fit: cover;
+            margin-right: 8px;
+            border: 2px solid #ffc107;
+            box-shadow: 0 2px 8px rgba(255,193,7,0.07);
         }
-        /* 折叠按钮 */
-        .navbar-toggler {
-            border: none;
+        .user-profile span {
+            font-weight: 600;
+            color: #ffe27c;
+            font-size: 1.09rem;
         }
-        .navbar-toggler-icon {
-            filter: invert(1);
-        }
-        /* 登录/注册 按钮 */
         .nav-item .btn-warning {
             background-color: #ffc107;
-            border-color: #ffc107;
+            border: none;
             color: #333;
             font-weight: 500;
-            transition: background-color .3s, color .3s;
+            box-shadow: 0 1px 8px rgba(255,193,7,0.08);
         }
         .nav-item .btn-warning:hover {
             background-color: #e0a800;
@@ -72,62 +99,57 @@
         }
         .nav-item .btn-outline-light {
             color: #fff;
-            transition: background-color .3s, color .3s;
+            border-color: #fff;
         }
         .nav-item .btn-outline-light:hover {
             background-color: #fff;
-            color: #333;
+            color: #343a40;
         }
-        /* 用户头像 */
-        .user-profile img {
-            width: 32px;
-            height: 32px;
-            object-fit: cover;
-            margin-right: 6px;
-            border: 2px solid #ffc107;
+        /* 小屏折叠菜单 */
+        @media (max-width: 991.98px) {
+            .nav-main {flex-direction: column; gap: 8px;}
+            .navbar-brand {margin-right: 0;}
+        }
+        @media (max-width: 576px) {
+            .user-profile span { display: none; }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
-            <span>博客平台</span>
-        </a>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">博客平台</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="切换导航">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="btn btn-outline-light ms-2" th:href="@{/}">首页</a>
-            </li>
-            <li class="nav-item">
-                <a class="btn btn-outline-light ms-2" th:href="@{/articles}">文章</a>
-            </li>
-            <li class="nav-item">
-                <a class="btn btn-outline-light ms-2" th:href="@{/hot/views}">热门榜单</a>
-            </li>
-        </ul>
         <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav nav-main me-auto mb-2 mb-lg-0 d-flex align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}"><i class="bi bi-house-door me-1"></i>首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-publish ms-1" th:href="@{/articles}"><i class="bi bi-pencil-square me-1"></i>发布文章</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/hot/views}"><i class="bi bi-fire me-1"></i>热门榜单</a>
+                </li>
+            </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
-                <!-- 未登录：登录 / 注册 按钮 -->
+                <!-- 未登录 -->
                 <li th:if="${session.currentUser == null}" class="nav-item">
-                    <a class="btn btn-warning ms-2" th:href="@{/login}">登录</a>
+                    <a class="btn btn-warning ms-2" th:href="@{/login}"><i class="bi bi-person-circle me-1"></i>登录</a>
                 </li>
                 <li th:if="${session.currentUser == null}" class="nav-item">
                     <a class="btn btn-outline-light ms-2" th:href="@{/register}">注册</a>
                 </li>
-                <!-- 已登录：显示头像和用户名 -->
+                <!-- 已登录 -->
                 <li th:unless="${session.currentUser == null}" class="nav-item me-3 user-profile">
-                    <a th:href="@{/profile}">
-                        <img th:src="@{/uploads/avatars/{file}(file=${session.currentUser.avatar_url})}"
-                             alt="头像"
-                             class="rounded-circle">
+                    <a th:href="@{/profile}" class="d-flex align-items-center text-decoration-none">
+                        <img th:src="@{/uploads/avatars/{file}(file=${session.currentUser.avatar_url})}" alt="头像" class="rounded-circle">
                         <span th:text="${session.currentUser.nickname}"></span>
                     </a>
                 </li>
-                <!-- 已登录：退出按钮 -->
                 <li th:unless="${session.currentUser == null}" class="nav-item">
                     <a class="btn btn-outline-light ms-2" th:href="@{/logout}">退出</a>
                 </li>

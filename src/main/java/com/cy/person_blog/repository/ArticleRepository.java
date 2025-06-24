@@ -92,4 +92,10 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
             Integer categoryId,
             Integer excludeId
     );
+    @Query("SELECT DATE(a.createdAt) as d, COUNT(a) FROM Article a WHERE DATE(a.createdAt) BETWEEN :start AND :end GROUP BY d ORDER BY d")
+    List<Object[]> countDailyArticleBetween(@Param("start") Date start, @Param("end") Date end);
+
+    // 统计文章每日浏览量（从 article_view_stat 表查询）
+    @Query(value = "SELECT view_date, SUM(view_count) FROM article_view_stat WHERE view_date BETWEEN :start AND :end GROUP BY view_date ORDER BY view_date", nativeQuery = true)
+    List<Object[]> countDailyViewBetween(@Param("start") Date start, @Param("end") Date end);
 }

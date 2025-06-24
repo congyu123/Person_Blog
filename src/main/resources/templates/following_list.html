@@ -4,29 +4,98 @@
     <meta charset="UTF-8">
     <title>我关注的人</title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+    <style>
+        body {
+            background: linear-gradient(120deg,#f7faff 60%, #fffbe9 100%);
+            font-family: 'Noto Sans SC', 'PingFang SC', Arial, sans-serif;
+        }
+        .container {
+            max-width: 780px;
+        }
+        .follow-header {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fa8900;
+            letter-spacing: .02em;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .follows-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+        .follow-card {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 14px rgba(255,180,90,0.09);
+            padding: 1.1rem 1.7rem;
+            transition: box-shadow .18s, transform .13s;
+            text-decoration: none !important;
+        }
+        .follow-card:hover {
+            box-shadow: 0 8px 24px rgba(253,178,68,0.13);
+            transform: translateY(-2px) scale(1.02);
+            background: #fffbe9;
+        }
+        .follow-avatar {
+            width: 54px; height: 54px; object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #fcb900;
+            box-shadow: 0 2px 6px rgba(240,150,80,0.10);
+            margin-right: 1.15rem;
+            transition: border-color .16s;
+        }
+        .follow-card:hover .follow-avatar {
+            border-color: #ff758c;
+        }
+        .follow-info {
+            flex: 1;
+        }
+        .follow-info strong {
+            font-size: 1.17rem;
+            color: #32325d;
+        }
+        .follow-info small {
+            display: block;
+            color: #828fa7;
+            margin-top: .13em;
+            font-size: .99rem;
+            font-weight: 400;
+            max-width: 27em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @media (max-width:600px) {
+            .container { padding: 0 3px; }
+            .follow-card { padding: 1rem 0.8rem; }
+            .follow-avatar { width: 42px; height: 42px; margin-right: .77rem; }
+        }
+    </style>
 </head>
 <body>
 <div th:insert="~{nav}"></div>
-
-<div class="container mt-4">
-    <h3>我关注的人</h3>
-    <div class="list-group">
+<div class="container mt-4 mb-5">
+    <div class="follow-header"><i class="fa fa-user-friends me-2"></i>我关注的人</div>
+    <div class="follows-list">
         <a th:each="u : ${following}"
            th:href="@{/users/{id}(id=${u.id})}"
-           class="list-group-item list-group-item-action d-flex align-items-center">
+           class="follow-card">
             <img th:src="@{/uploads/avatars/{f}(f=${u.avatar_url})}"
-                 class="rounded-circle me-3" width="40" height="40" alt="头像"/>
-            <div>
-                <strong th:text="${u.nickname}">昵称</strong><br/>
-                <small th:text="${u.bio}">个人简介</small>
+                 class="follow-avatar" alt="头像"/>
+            <div class="follow-info">
+                <strong th:text="${u.nickname}">昵称</strong>
+                <small th:text="${u.bio != null && u.bio.trim().length() > 0 ? u.bio : '这个人很神秘，暂无简介~'}">个人简介</small>
             </div>
         </a>
-        <p th:if="${#lists.isEmpty(following)}" class="text-muted mt-2">
-            您还未关注任何人。
-        </p>
+        <div th:if="${#lists.isEmpty(following)}" class="text-muted mt-2 text-center" style="font-size:1.1rem;">
+            <i class="fa fa-info-circle me-1"></i>您还未关注任何人。
+        </div>
     </div>
 </div>
-
-<div th:replace="footer"></div>
 </body>
 </html>

@@ -26,4 +26,5 @@ public interface ArticleService {
     List<Article> getPopularByViews(int limit);
     List<Article> getPopularByLikes(int limit);
     List<Article> getPopularByFavorites(int limit);
+
 }

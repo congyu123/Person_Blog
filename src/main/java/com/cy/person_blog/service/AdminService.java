@@ -21,4 +21,8 @@ public interface AdminService {
 
     void handleReport(Integer reportId, boolean isValid);
     List<Report> getResolvedReports();
+    List<Integer> getLast7DaysArticleCount();
+    List<Integer> getLast7DaysCommentCount();
+    List<Integer> getLast7DaysVisitCount();
+    List<String> getLast7DaysLabels();
 }

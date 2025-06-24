@@ -4,46 +4,229 @@
     <meta charset="UTF-8">
     <title th:text="${userProfile.nickname} + ' 的主页'">用户主页</title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', 'PingFang SC', Arial, sans-serif;
+            background: #f8f9fa;
+        }
+        .profile-header-card {
+            border-radius: 1.5rem;
+            background: linear-gradient(120deg,#ffecd2 0,#fcb69f 100%);
+            box-shadow: 0 6px 36px rgba(252,185,0,0.08);
+            padding: 2rem 1.5rem;
+            margin-bottom: 2.3rem;
+            display: flex;
+            align-items: center;
+        }
+        .profile-header-card img {
+            width: 90px; height: 90px; object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid #fcb900;
+            box-shadow: 0 2px 12px rgba(250,170,0,0.12);
+            margin-right: 1.7rem;
+        }
+        .profile-header-info h4 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #f77f00;
+            margin-bottom: .5rem;
+        }
+        .profile-header-info p {
+            color: #555;
+            font-size: 1.06rem;
+            margin-bottom: .6rem;
+            max-width: 32em;
+        }
+        .profile-header-info .follow-btn {
+            font-weight: 600;
+            min-width: 90px;
+            font-size: 1rem;
+        }
+        .profile-header-meta {
+            margin-left: auto;
+            text-align: right;
+            color: #995d17;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        .profile-header-meta strong {
+            font-size: 1.15em;
+            color: #fa8900;
+        }
+        /* 文章卡片 */
+        .masonry {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+            gap: 1.4rem;
+        }
+        .blog-card {
+            border-radius: 1.25rem;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(75, 72, 103, 0.07);
+            transition: transform 0.18s, box-shadow 0.23s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+        }
+        .blog-card:hover {
+            transform: translateY(-7px) scale(1.03);
+            box-shadow: 0 16px 32px rgba(75, 72, 103, 0.15);
+        }
+        .blog-card-img-box {
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            background: #eee;
+        }
+        .blog-card-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter .3s, transform .5s;
+        }
+        .blog-card:hover .blog-card-img-box img {
+            filter: brightness(93%);
+            transform: scale(1.06);
+        }
+        .blog-card-body {
+            padding: 1.25rem 1.4rem 1.05rem 1.4rem;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-card-title {
+            font-size: 1.23rem;
+            font-weight: bold;
+            margin-bottom: .33rem;
+            line-height: 1.23;
+        }
+        .blog-card-title a {
+            color: #223;
+            text-decoration: none;
+        }
+        .blog-card-title a:hover {
+            text-decoration: underline;
+            color: #f77f00;
+        }
+        .blog-card-meta {
+            font-size: .95rem;
+            color: #999;
+            margin-bottom: .17rem;
+        }
+        .blog-card-meta .fa {
+            margin-right: 0.21em;
+        }
+        .blog-card-tags {
+            margin: .4rem 0 .3rem 0;
+        }
+        .blog-card-tags .badge {
+            margin-right: .17em;
+            margin-bottom: .09em;
+            font-size: 0.89em;
+            font-weight: 600;
+        }
+        .badge-tag0 {background:#a3cef1;color:#114b5f;}
+        .badge-tag1 {background:#fcb900;color:#222;}
+        .badge-tag2 {background:#a3e635;color:#2d6a4f;}
+        .badge-tag3 {background:#f77f00;color:#fff;}
+        .badge-tag4 {background:#e07a5f;color:#fff;}
+        .badge-tag5 {background:#b5838d;color:#fff;}
+        .badge-tag6 {background:#0091ad;color:#fff;}
+        .badge-tag7 {background:#38b000;color:#fff;}
+        .badge-tag8 {background:#7b2ff2;color:#fff;}
+        .badge-tag9 {background:#cdb4db;color:#553780;}
+        .blog-card-desc {
+            color: #495057;
+            font-size: 1.02rem;
+            margin-bottom: 0;
+            min-height: 2.2em;
+        }
+        .blog-card .btn-primary {
+            background: #f77f00;
+            border: none;
+            font-size: .98rem;
+        }
+        .blog-card .btn-primary:hover {
+            background: #fcb900;
+            color: #222;
+        }
+        .empty-tip {
+            padding: 3.3rem 0 2.7rem;
+            text-align: center;
+            color: #bbb;
+            font-size: 1.12rem;
+        }
+        @media (max-width: 900px) {
+            .profile-header-card { flex-direction: column; align-items: flex-start; text-align: left;}
+            .profile-header-card img { margin-bottom: 1.2rem; margin-right: 0;}
+            .profile-header-meta {margin:1rem 0 0 0; text-align: left;}
+        }
+        @media (max-width: 600px) {
+            .masonry { grid-template-columns: 1fr; }
+            .profile-header-card {padding: 1.1rem 0.5rem;}
+            .blog-card-body {padding: 1.1rem;}
+        }
+    </style>
 </head>
 <body>
 <div th:insert="~{nav}"></div>
-
 <div class="container mt-4">
     <!-- 个人信息卡 -->
-    <div class="card mb-4">
-        <div class="card-body d-flex align-items-center">
-            <img th:src="@{/uploads/avatars/{f}(f=${userProfile.avatar_url})}"
-                 class="rounded-circle me-3" width="80" height="80" alt="头像"/>
-            <div>
-                <h4 th:text="${userProfile.nickname}">昵称</h4>
-                <p th:text="${userProfile.bio}">个人简介</p>
-                <button id="followBtn" class="btn btn-sm"
-                        th:classappend="${isFollowing} ? 'btn-secondary':'btn-outline-primary'"
-                        th:data-url="@{/users/{id}/follow(id=${userProfile.id})}">
-                    <span th:text="${isFollowing} ? '已关注':'关注'"></span>
-                </button>
-            </div>
+    <div class="profile-header-card mb-4">
+        <img th:src="@{/uploads/avatars/{f}(f=${userProfile.avatar_url})}" alt="头像"/>
+        <div class="profile-header-info flex-grow-1">
+            <h4 th:text="${userProfile.nickname}">昵称</h4>
+            <p th:text="${userProfile.bio}">个人简介</p>
+            <button id="followBtn" class="btn btn-sm follow-btn"
+                    th:classappend="${isFollowing} ? 'btn-secondary':'btn-outline-primary'"
+                    th:data-url="@{/users/{id}/follow(id=${userProfile.id})}">
+                <span th:text="${isFollowing} ? '已关注':'关注'"></span>
+            </button>
         </div>
-        <div class="card-footer">
+        <div class="profile-header-meta ms-auto">
             粉丝：<strong th:text="${followerCount}">0</strong>
-            &nbsp;|&nbsp;
-            关注：<strong th:text="${followingCount}">0</strong>
+            <br/>关注：<strong th:text="${followingCount}">0</strong>
         </div>
     </div>
 
-    <!-- TA 的文章列表 -->
-    <div class="card">
-        <div class="card-header">TA 的文章</div>
-        <ul class="list-group list-group-flush">
-            <li th:each="a : ${articles}" class="list-group-item d-flex justify-content-between">
-                <a th:href="@{/articles/{id}(id=${a.id})}" th:text="${a.title}">文章标题</a>
-                <small class="text-muted" th:text="${#dates.format(a.createdAt,'yyyy-MM-dd')}">日期</small>
-            </li>
-            <li th:if="${#lists.isEmpty(articles)}" class="list-group-item text-muted">
-                暂无已发布文章
-            </li>
-        </ul>
+    <!-- 文章卡片区 -->
+    <div class="masonry mb-5">
+        <div th:each="article,iter : ${articles}" class="blog-card">
+            <div th:if="${article.firstImageUrl != null}" class="blog-card-img-box">
+                <img th:src="${#httpServletRequest.contextPath + article.firstImageUrl}" alt="文章首图" />
+            </div>
+            <div class="blog-card-body">
+                <div class="blog-card-title">
+                    <a th:href="@{/articles/{id}(id=${article.id})}"
+                       th:text="${article.title}">文章标题</a>
+                </div>
+                <div class="blog-card-meta mb-1">
+                    <i class="fa fa-calendar-alt"></i>
+                    <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    &nbsp;|&nbsp;
+                    分类：
+                    <span th:each="cat : ${categories}"
+                          th:if="${cat.id == article.categoryId}"
+                          th:text="${cat.name}"></span>
+                </div>
+                <div class="blog-card-tags">
+                    <span th:each="t,tagIter : ${#strings.arraySplit(article.tags, ',')}"
+                          th:class="'badge badge-tag' + ${tagIter.index % 10}"
+                          th:text="${t}">标签</span>
+                </div>
+                <p th:if="${article.summaryText != null}" class="blog-card-desc"
+                   th:text="${article.summaryText}"></p>
+                <a th:href="@{/articles/{id}(id=${article.id})}" class="btn btn-sm btn-primary mt-2">
+                    <i class="fa fa-book-reader"></i> 阅读全文
+                </a>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(articles)}" class="empty-tip">
+            <i class="fa fa-info-circle me-2"></i>暂无已发布文章
+        </div>
     </div>
 </div>
 
@@ -59,8 +242,7 @@
                 this.classList.toggle('btn-secondary');
                 this.classList.toggle('btn-outline-primary');
                 // 同步粉丝数
-                this.closest('.card').querySelector('strong')
-                    .textContent = cnt;
+                document.querySelector('.profile-header-meta strong').textContent = cnt;
             });
     });
 </script>

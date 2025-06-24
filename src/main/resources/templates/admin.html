@@ -3,119 +3,300 @@
 <head>
     <meta charset="UTF-8"/>
     <title>管理员后台</title>
+    <!-- Bootstrap & FontAwesome -->
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: #f5f6fa;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 30px auto 0 auto;
+            padding: 30px 24px 24px 24px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(50, 68, 130, 0.11);
+        }
+        .dashboard-title {
+            font-weight: 900;
+            font-size: 2.4rem;
+            margin-bottom: 2.5rem;
+            color: #324482;
+            letter-spacing: 2px;
+        }
+        .card-dashboard {
+            box-shadow: 0 4px 16px rgba(70, 127, 207, 0.08);
+            border-radius: 1.2rem;
+            border: none;
+            transition: transform .18s cubic-bezier(.23,1.01,.47,1.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-dashboard:hover {
+            transform: translateY(-4px) scale(1.022);
+            box-shadow: 0 8px 32px rgba(70, 127, 207, 0.13);
+        }
+        .card-body {
+            padding-bottom: 0.2rem;
+        }
+        .card-icon {
+            font-size: 2.2rem;
+            opacity: 0.25;
+            position: absolute;
+            top: 1.1rem;
+            right: 1.2rem;
+            pointer-events: none;
+        }
+        .sparkline {
+            margin-top: .8rem;
+            margin-bottom: -.5rem;
+        }
+        .dashboard-section-title {
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #324482;
+            letter-spacing: 1px;
+            border-left: 5px solid #8aa5ee;
+            padding-left: 12px;
+            background: linear-gradient(90deg,#f2f7ff,#fff);
+            border-radius: 0 18px 18px 0;
+        }
+        .table-section {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(70,127,207,0.06);
+            border-radius: 1rem;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .table thead tr {
+            background: #f2f7ff;
+            font-weight: bold;
+        }
+        .table tbody tr:hover {
+            background: #f3f8ff !important;
+        }
+        .badge-status {
+            font-size: .95em;
+            padding: .5em 1em;
+            border-radius: 1rem;
+        }
+        .badge-status-resolved { background: #53c59c; color: #fff; }
+        .badge-status-pending  { background: #e09c6a; color: #fff; }
+        .btn-action {
+            border-radius: 1.5em;
+            padding: .25em 1.2em;
+            font-size: .95em;
+            margin-right: .4em;
+        }
+        @media (max-width: 768px) {
+            .dashboard-container { padding: 8px; }
+            .card-dashboard { margin-bottom: 1rem;}
+            .table-section { padding: 8px;}
+        }
+        /* 使表格在小屏可横向滚动 */
+        .table-responsive {overflow-x: auto;}
+    </style>
 </head>
 <body>
-<div class="container mt-4">
-    <h1>管理员后台</h1>
+<div class="dashboard-container">
+    <div class="dashboard-title">管理员后台</div>
 
-    <div class="row my-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary">
+    <!-- 仪表盘卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-12 mb-3 mb-md-0">
+            <div class="card card-dashboard text-white bg-primary position-relative">
                 <div class="card-body">
+                    <span class="card-icon"><i class="fa fa-file-text"></i></span>
                     <h5>文章数</h5>
-                    <p th:text="${articleCount}"></p>
+                    <h2 class="mb-0" th:text="${articleCount}"></h2>
+                    <canvas id="spark-articles" height="40" class="sparkline"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success">
+        <div class="col-md-4 col-12 mb-3 mb-md-0">
+            <div class="card card-dashboard text-white bg-success position-relative">
                 <div class="card-body">
+                    <span class="card-icon"><i class="fa fa-comments"></i></span>
                     <h5>评论数</h5>
-                    <p th:text="${commentCount}"></p>
+                    <h2 class="mb-0" th:text="${commentCount}"></h2>
+                    <canvas id="spark-comments" height="40" class="sparkline"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-info">
+        <div class="col-md-4 col-12">
+            <div class="card card-dashboard text-white bg-info position-relative">
                 <div class="card-body">
+                    <span class="card-icon"><i class="fa fa-eye"></i></span>
                     <h5>总访问量</h5>
-                    <p th:text="${visitCount}"></p>
+                    <h2 class="mb-0" th:text="${visitCount}"></h2>
+                    <canvas id="spark-visits" height="40" class="sparkline"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <h2>待审核文章</h2>
-    <table class="table table-bordered">
-        <thead><tr><th>ID</th><th>标题</th><th>作者ID</th><th>操作</th></tr></thead>
-        <tbody>
-        <tr th:each="a : ${pendingArticles}">
-            <td th:text="${a.id}"></td>
-            <td th:text="${a.title}"></td>
-            <td th:text="${a.authorId}"></td>
-            <td>
-                <form th:action="@{'/admin/articles/'+${a.id}+'/approve'}" method="post" class="d-inline">
-                    <button class="btn btn-sm btn-success">通过</button>
-                </form>
-                <form th:action="@{'/admin/articles/'+${a.id}+'/reject'}" method="post" class="d-inline">
-                    <button class="btn btn-sm btn-danger">驳回</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- 趋势图 -->
+    <div class="card mb-5" style="border-radius:1.2rem;">
+        <div class="card-body">
+            <h5 class="mb-4" style="color:#324482;font-weight:600;">一周数据趋势</h5>
+            <canvas id="trendChart" height="80"></canvas>
+        </div>
+    </div>
 
-    <h2>未处理举报</h2>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>ID</th><th>举报者</th><th>类型</th><th>目标ID</th>
-            <th>理由</th><th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="r : ${pendingReports}">
-            <td th:text="${r.id}"></td>
-            <td th:text="${r.reporterId}"></td>
-            <td th:text="${r.targetType}"></td>
-            <td th:text="${r.targetId}"></td>
-            <td th:text="${r.reason}"></td>
-            <td>
-                <a th:href="@{'/admin/reports/'+${r.id}}" class="btn btn-sm btn-primary">
-                    查看并处理
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- 待审核文章 -->
+    <div class="dashboard-section-title">待审核文章</div>
+    <div class="table-section table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+            <tr>
+                <th>ID</th><th>标题</th><th>作者ID</th><th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${pendingArticles}">
+                <td th:text="${a.id}"></td>
+                <td th:text="${a.title}"></td>
+                <td th:text="${a.authorId}"></td>
+                <td>
+                    <a th:href="@{'/admin/articles/' + ${a.id} + '/review'}" class="btn btn-sm btn-primary btn-action" title="查看详情">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                    <!-- 审核按钮可留在详情页，表格只保留“查看详情” -->
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pendingArticles)}">
+                <td colspan="4" class="text-center text-muted">暂无待审核文章</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <h2>已处理举报</h2>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>ID</th><th>举报者</th><th>类型</th><th>目标ID</th>
-            <th>理由</th><th>状态</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="r : ${resolvedReports}">
-            <td th:text="${r.id}"></td>
-            <td th:text="${r.reporterId}"></td>
-            <td th:text="${r.targetType}"></td>
-            <td th:text="${r.targetId}"></td>
-            <td th:text="${r.reason}"></td>
-            <td th:text="${r.status}"></td>
-        </tr>
-        </tbody>
-    </table>
-    <h2>赋予管理员</h2>
-    <table class="table table-bordered">
-        <thead><tr><th>ID</th><th>Email</th><th>昵称</th><th>操作</th></tr></thead>
-        <tbody>
-        <tr th:each="u : ${users}">
-            <td th:text="${u.id}"></td>
-            <td th:text="${u.email}"></td>
-            <td th:text="${u.nickname}"></td>
-            <td>
-                <form th:action="@{'/admin/users/'+${u.id}+'/grant'}" method="post">
-                    <button class="btn btn-sm btn-secondary">设为管理员</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- 未处理举报 -->
+    <div class="dashboard-section-title">未处理举报</div>
+    <div class="table-section table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+            <tr>
+                <th>ID</th><th>举报者</th><th>类型</th><th>目标ID</th>
+                <th>理由</th><th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${pendingReports}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.reporterId}"></td>
+                <td th:text="${r.targetType}"></td>
+                <td th:text="${r.targetId}"></td>
+                <td th:text="${r.reason.length() > 20 ? r.reason.substring(0, 20) + '…' : r.reason}" th:title="${r.reason}"></td>
+                <td>
+                    <a th:href="@{'/admin/reports/'+${r.id}}" class="btn btn-sm btn-primary btn-action" title="查看并处理">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pendingReports)}">
+                <td colspan="6" class="text-center text-muted">暂无未处理举报</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 已处理举报 -->
+    <div class="dashboard-section-title">已处理举报</div>
+    <div class="table-section table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+            <tr>
+                <th>ID</th><th>举报者</th><th>类型</th><th>目标ID</th>
+                <th>理由</th><th>状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${resolvedReports}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.reporterId}"></td>
+                <td th:text="${r.targetType}"></td>
+                <td th:text="${r.targetId}"></td>
+                <td th:text="${r.reason.length() > 20 ? r.reason.substring(0, 20) + '…' : r.reason}" th:title="${r.reason}"></td>
+                <td>
+                    <span th:classappend="${r.status=='RESOLVED'} ? 'badge badge-status badge-status-resolved' : 'badge badge-status badge-status-pending'" th:text="${r.status=='RESOLVED' ? '未处理' : '已处理'}"></span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(resolvedReports)}">
+                <td colspan="6" class="text-center text-muted">暂无已处理举报</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 赋予管理员 -->
+    <div class="dashboard-section-title">赋予管理员</div>
+    <div class="table-section table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead><tr><th>ID</th><th>Email</th><th>昵称</th><th>操作</th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.id}"></td>
+                <td th:text="${u.email}"></td>
+                <td th:text="${u.nickname}"></td>
+                <td>
+                    <form th:action="@{'/admin/users/'+${u.id}+'/grant'}" method="post">
+                        <button class="btn btn-sm btn-secondary btn-action" title="设为管理员"><i class="fa fa-user-plus"></i></button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(users)}">
+                <td colspan="4" class="text-center text-muted">暂无普通用户</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 </body>
+<script th:inline="javascript">
+    // Chart.js 渲染
+    const articleStats = [[${articleStats}]];
+    const commentStats = [[${commentStats}]];
+    const visitStats   = [[${visitStats}]];
+    const days = /*[[${days}]]*/ [];
+
+    // Sparkline
+    new Chart(document.getElementById('spark-articles'), {
+        type: 'line',
+        data: { labels: days, datasets: [{ data: articleStats, borderWidth: 2, borderColor: '#fff', tension: .5, pointRadius: 0, fill: false }]},
+        options: { responsive: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+    });
+    new Chart(document.getElementById('spark-comments'), {
+        type: 'line',
+        data: { labels: days, datasets: [{ data: commentStats, borderWidth: 2, borderColor: '#fff', tension: .5, pointRadius: 0, fill: false }]},
+        options: { responsive: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+    });
+    new Chart(document.getElementById('spark-visits'), {
+        type: 'line',
+        data: { labels: days, datasets: [{ data: visitStats, borderWidth: 2, borderColor: '#fff', tension: .5, pointRadius: 0, fill: false }]},
+        options: { responsive: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+    });
+
+    // 趋势图
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [
+                { label: '文章数', data: articleStats, borderColor: '#007bff', fill: false, tension: .4, pointBackgroundColor: '#007bff', pointRadius: 5 },
+                { label: '评论数', data: commentStats, borderColor: '#28a745', fill: false, tension: .4, pointBackgroundColor: '#28a745', pointRadius: 5 },
+                { label: '访问量', data: visitStats, borderColor: '#17a2b8', fill: false, tension: .4, pointBackgroundColor: '#17a2b8', pointRadius: 5 }
+            ]
+        },
+        options: {
+            plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true, grid: { color: "#e6e9f1" } }, x: { grid: { color: "#e6e9f1" } } }
+        }
+    });
+</script>
 </html>

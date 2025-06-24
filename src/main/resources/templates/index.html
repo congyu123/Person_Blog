@@ -140,7 +140,6 @@
             font-weight: 600;
             letter-spacing: .01em;
         }
-        /* 丰富的 Badge 颜色 */
         .badge-tag0 {background:#a3cef1;color:#114b5f;}
         .badge-tag1 {background:#fcb900;color:#222;}
         .badge-tag2 {background:#a3e635;color:#2d6a4f;}
@@ -204,7 +203,6 @@
     </form>
 </div>
 
-<!-- 文章 Masonry 网格 -->
 <main class="container pb-4">
     <div class="masonry">
         <div th:each="article,iter : ${articles}" class="blog-card">
@@ -239,7 +237,6 @@
         </div>
     </div>
 
-    <!-- 分页 -->
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">

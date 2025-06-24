@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>文章审核</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container mt-5" style="max-width:800px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 th:text="${article.title}">文章标题</h3>
+            <div class="mb-2 text-muted">
+                <span>作者ID: <span th:text="${article.authorId}"></span></span>
+                <span class="ms-3">分类: <span th:text="${article.categoryId}"></span></span>
+                <span class="ms-3">标签: <span th:text="${article.tags}"></span></span>
+            </div>
+            <div class="mb-2 text-muted">
+                提交时间：<span th:text="${#dates.format(article.createdAt,'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+            <hr/>
+            <div style="min-height:220px;">
+                <div th:utext="${article.content}"></div>
+            </div>
+            <hr/>
+            <form th:action="@{'/admin/articles/' + ${article.id} + '/approve'}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-success me-2"><i class="fa fa-check"></i> 通过</button>
+            </form>
+            <form th:action="@{'/admin/articles/' + ${article.id} + '/reject'}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger"><i class="fa fa-times"></i> 驳回</button>
+            </form>
+            <a th:href="@{/admin}" class="btn btn-secondary ms-2">返回</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
