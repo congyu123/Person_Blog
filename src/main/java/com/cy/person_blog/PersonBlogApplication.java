@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 
-@EnableJpaRepositories(basePackages = "com.cy.person_blog.repository") // 显式启用扫描
+@EnableJpaRepositories(basePackages = "com.cy.person_blog.repository")
 
 public class PersonBlogApplication {
 

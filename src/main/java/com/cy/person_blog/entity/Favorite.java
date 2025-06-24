@@ -27,10 +27,9 @@ public class Favorite {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 枚举类型定义
     public enum FavoriteType {
-        LIKE,       // 点赞
-        FAVORITE    // 收藏
+        LIKE,
+        FAVORITE
     }
 
     public Integer getId() {
@@ -89,11 +88,9 @@ public class Favorite {
         this.article = article;
     }
 
-    // 非数据库字段，用于存储用户信息
     @Transient
     private User user;
 
-    // 非数据库字段，用于存储文章信息
     @Transient
     private Article article;
 }

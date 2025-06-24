@@ -61,7 +61,6 @@ public class UserServiceImpl implements UserService {
             String ext = StringUtils.getFilenameExtension(avatar.getOriginalFilename());
             String filename = UUID.randomUUID() + "." + ext;
 
-            // 基于项目根目录拼出上传目录
             String projectDir = System.getProperty("user.dir");
             Path uploadPath = Paths.get(projectDir, avatarUploadDir);
 
@@ -69,10 +68,8 @@ public class UserServiceImpl implements UserService {
                 Files.createDirectories(uploadPath);
             }
 
-            // 保存文件到 <项目根>/uploads/avatars/filename
             avatar.transferTo(uploadPath.resolve(filename).toFile());
 
-            // 只存文件名，访问时走 /uploads/avatars/{filename}
             user.setAvatar_url(filename);
         }
 

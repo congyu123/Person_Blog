@@ -34,18 +34,15 @@ public class ProfileController {
             return "redirect:/login";
         }
 
-        // 加载完整 user
         User user = userService.findById(current.getId());
         model.addAttribute("user", user);
 
-        // 头像 URL
         String avatarUrl = (user.getAvatar_url() != null && !user.getAvatar_url().isEmpty())
                 ? "/uploads/avatars/" + user.getAvatar_url()
                 : "static/img/default-avatar.png";
         model.addAttribute("userAvatarUrl", avatarUrl);
 
         Integer userId = user.getId();
-        // 文章列表
         model.addAttribute("publishedArticles",
                 articleService.getByAuthorAndStatus(userId, Article.Status.PUBLISHED));
         model.addAttribute("pendingArticles",
@@ -69,7 +66,6 @@ public class ProfileController {
         model.addAttribute("followingCount", followingCount);
         model.addAttribute("followingList", followService.getFollowing(userId));
 
-        // 新增：我点赞的／我收藏的
         List<Article> likedArticles =
                 favoriteService.listUserFavoriteArticles(userId, Favorite.FavoriteType.LIKE);
         List<Article> favoritedArticles =

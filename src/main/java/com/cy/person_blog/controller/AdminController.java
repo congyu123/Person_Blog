@@ -88,7 +88,6 @@ public class AdminController {
             return "redirect:/admin";
         }
 
-        // 处理内容图片路径
         article.setContent(fixImageSrc(article.getContent()));
         model.addAttribute("article", article);
         return "admin_article_review";

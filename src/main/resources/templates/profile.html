@@ -108,7 +108,6 @@
         .btn-primary:hover { background: #0051ff; }
         .btn-warning { background: #ffc107; color: #fff;}
         .btn-warning:hover { background: #fcb900; color: #fff;}
-        /* 统计卡片动效 */
         .stat-card {
             background: linear-gradient(100deg,#f1f5fd 0,#fff9eb 100%);
             border-radius: 17px;
@@ -134,7 +133,6 @@
             font-size: 1.38em;
             margin-right: .26em;
         }
-        /* chart区域 */
         .chart-container {
             flex: 1;
             background: #fff6ec;
@@ -148,7 +146,6 @@
         }
         .chart-title { font-size: 1.06rem; font-weight: 700; margin-bottom: 0.45rem; color: #fd7e14; letter-spacing:.3px;}
         #interactionChart { flex: 1; }
-        /* 内容分区卡片 */
         .articles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
@@ -406,12 +403,10 @@
             });
         });
 
-        // 折线图实现
         const ctx = document.getElementById('interactionChart').getContext('2d');
         let interactionChart;
         let currentPeriod = 'week';
 
-        // 初始化图表
         function initChart(labels, likes, favorites, views) {
             if (interactionChart) {
                 interactionChart.destroy();
@@ -495,7 +490,6 @@
             });
         }
 
-        // 加载统计数据
         function loadChartData(period) {
             $('.chart-btn').removeClass('active');
             $(`.chart-btn[data-period="${period}"]`).addClass('active');
@@ -526,7 +520,6 @@
             });
         }
 
-        // 初始加载数据
         loadChartData(7);
 
 

@@ -111,7 +111,6 @@ public class AdminServiceImpl implements AdminService {
         return fillDateGap(raw, start, today);
     }
 
-    // 近7天每日新增评论数
     @Override
     public List<Integer> getLast7DaysCommentCount() {
         LocalDate today = LocalDate.now();
@@ -120,7 +119,6 @@ public class AdminServiceImpl implements AdminService {
         return fillDateGap(raw, start, today);
     }
 
-    // 近7天每日访问量(用article_view_stat表)
     @Override
     public List<Integer> getLast7DaysVisitCount() {
         LocalDate today = LocalDate.now();
@@ -129,7 +127,6 @@ public class AdminServiceImpl implements AdminService {
         return fillDateGap(raw, start, today);
     }
 
-    // 辅助方法：填充日期空缺为0
     private List<Integer> fillDateGap(List<Object[]> dbResult, LocalDate start, LocalDate end) {
         Map<String, Integer> map = new HashMap<>();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM-dd");

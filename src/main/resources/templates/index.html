@@ -43,7 +43,6 @@
             100% { transform: translateY(-8px);}
         }
 
-        /* 筛选表单横向放置 */
         .filter-bar {
             background: rgba(255,255,255,.92);
             box-shadow: 0 4px 24px rgba(200,150,100,0.07);
@@ -63,7 +62,6 @@
             min-width: 80px;
         }
 
-        /* Masonry 卡片网格 */
         .masonry {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(330px,1fr));
@@ -178,15 +176,12 @@
     </style>
 </head>
 <body>
-<!-- 导航栏 -->
 <div th:insert="~{nav.html}"></div>
 
-<!-- Banner区域 -->
 <div class="banner">
     <i class="fas fa-book-open"></i>
     <div class="banner-title">发现好文 · 成就灵感</div>
     <div class="banner-desc">高质量的个人博客平台，发现、分享、成长。立即筛选喜欢的内容吧！</div>
-    <!-- 筛选表单 -->
     <form class="filter-bar" th:action="@{/}" method="get">
         <select name="categoryId" class="form-select">
             <option value="0" th:selected="${selectedCategory == 0}">所有分类</option>

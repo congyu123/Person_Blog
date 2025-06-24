@@ -33,12 +33,10 @@ public class Comment {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    /**** ② 当前评论下的所有子回复（一对多），由 parentId 维护 ****/
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", referencedColumnName = "id", insertable = false, updatable = false)
     private List<Comment> replies = new ArrayList<>();
 
-    // ========== Getter & Setter ==========
     public Integer getId() {
         return id;
     }

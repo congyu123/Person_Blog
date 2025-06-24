@@ -45,26 +45,20 @@ public class FollowController {
     public String listFollowing(HttpSession session, Model model) {
         User me = (User) session.getAttribute("currentUser");
         if (me == null) return "redirect:/login";
-        // followService.getFollowing 返回 List<User>
         model.addAttribute("following", followService.getFollowing(me.getId()));
         return "following_list";
     }
 
-    // —— 查看某人主页 ——
     @GetMapping("/{id}")
     public String viewUserProfile(@PathVariable Integer id,
                                   HttpSession session,
                                   Model model) {
         User target = userService.findById(id);
-        // TA 的基本信息
         model.addAttribute("userProfile", target);
-        // TA 的文章
         List<Article> list = articleService.getByAuthorAndStatus(id, Article.Status.PUBLISHED);
         model.addAttribute("articles", list);
-        // 统计粉丝／关注
         model.addAttribute("followerCount", followService.getFollowerCount(id));
         model.addAttribute("followingCount", followService.countFollowing(id));
-        // 当前用户是否已关注 TA
         User me = (User) session.getAttribute("currentUser");
         boolean isFollowing = me != null && followService.isFollowing(me.getId(), id);
         model.addAttribute("isFollowing", isFollowing);

@@ -128,11 +128,9 @@
         .modal-content {
             border-radius: 22px;
         }
-        /* 添加一点简单过渡动画 */
         .form-control, .form-select, .editor-shadow, .btn {
             transition: box-shadow 0.15s, border 0.15s, background 0.15s, color 0.15s;
         }
-        /* 字数统计更突出 */
         #wordCount {
             font-weight: 700;
             color: #2c69fc;
@@ -395,7 +393,6 @@
         });
     }
 
-    // 丢弃确认
     document.getElementById('discardBtn').addEventListener('click', function() {
         if (confirm('确定要丢弃当前编辑的内容吗？所有更改都将丢失。')) {
             window.history.back();

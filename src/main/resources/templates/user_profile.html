@@ -54,7 +54,6 @@
             font-size: 1.15em;
             color: #fa8900;
         }
-        /* 文章卡片 */
         .masonry {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
@@ -192,7 +191,6 @@
         </div>
     </div>
 
-    <!-- 文章卡片区 -->
     <div class="masonry mb-5">
         <div th:each="article,iter : ${articles}" class="blog-card">
             <div th:if="${article.firstImageUrl != null}" class="blog-card-img-box">
@@ -237,11 +235,9 @@
             .then(r=>r.text())
             .then(cnt=>{
                 if(cnt.startsWith('error')) return alert('请先登录');
-                // 更新按钮状态和粉丝数
                 this.textContent = this.textContent==='关注'?'已关注':'关注';
                 this.classList.toggle('btn-secondary');
                 this.classList.toggle('btn-outline-primary');
-                // 同步粉丝数
                 document.querySelector('.profile-header-meta strong').textContent = cnt;
             });
     });

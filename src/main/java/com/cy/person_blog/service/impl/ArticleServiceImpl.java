@@ -86,11 +86,9 @@ public class ArticleServiceImpl implements ArticleService {
         for (Article art : pageData) {
             String html = art.getContent();
             if (html != null) {
-                // —— 提取首张图片 ——
                 Matcher imgM = IMG_PATTERN.matcher(html);
                 if (imgM.find()) {
                     String raw = imgM.group(1);
-                    // "../uploads/…" → "/uploads/…"
                     String normalized = raw.replaceAll("^\\.\\./+", "/");
                     if (!normalized.startsWith("/")) {
                         normalized = "/" + normalized;
@@ -98,7 +96,6 @@ public class ArticleServiceImpl implements ArticleService {
                     art.setFirstImageUrl(normalized);
                 }
 
-                // —— 提取纯文字摘要 ——
 
                 String text = TAG_PATTERN.matcher(html).replaceAll("").trim();
                 if (!text.isEmpty()) {
@@ -136,7 +133,6 @@ public class ArticleServiceImpl implements ArticleService {
         Set<Integer> addedIds = new HashSet<>();
         List<Article> candidates = new ArrayList<>();
 
-        // —— 1. 标签推荐 ——
         String tags = current.getTags();
         if (tags != null && !tags.trim().isEmpty()) {
             for (String t : tags.split(",")) {
@@ -153,7 +149,6 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
 
-        // —— 2. 同分类推荐 ——
         Integer catId = current.getCategoryId();
         if (catId != null) {
             List<Article> byCat = articleRepo
@@ -167,13 +162,11 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
 
-        // —— 3. 全部候选按发布时间倒序、截取前 topCount 条 ——
         List<Article> sorted = candidates.stream()
                 .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                 .limit(topCount)
                 .collect(Collectors.toList());
 
-        // —— 4. （可选）为每条推荐填充首图和摘要 ——
         Pattern IMG = Pattern.compile("<img[^>]*src=[\"']([^\"']+)[\"'][^>]*>", Pattern.CASE_INSENSITIVE);
         Pattern TAG = Pattern.compile("(?s)<[^>]*>");
         for (Article rel : sorted) {
@@ -215,7 +208,6 @@ public class ArticleServiceImpl implements ArticleService {
         for (Object[] row : rows) {
             Article a = (Article) row[0];
             Long cnt = (Long) row[1];
-            // 填充 transient
             a.setLikeCount(cnt);
             a.setAuthorName(userService.findById(a.getAuthorId()).getNickname());
             list.add(a);

@@ -1,4 +1,3 @@
-// ArticleController.java
 package com.cy.person_blog.controller;
 
 import com.cy.person_blog.entity.*;

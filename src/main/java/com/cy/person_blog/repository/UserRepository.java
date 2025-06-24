@@ -12,15 +12,13 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
-    List<User> findByIsAdminFalse();  // 获取所有非管理员用户
+    List<User> findByIsAdminFalse();
 
-    /** 粉丝数 +1（JPQL 里加法没问题） */
     @Modifying
     @Transactional
     @Query("UPDATE User u SET u.followerCount = u.followerCount + 1 WHERE u.id = :userId")
     void incrementFollowerCount(@Param("userId") Integer userId);
 
-    /** 粉丝数 -1，但不让它变成负数，直接在数据库里只对 >0 的行做自减 */
     @Modifying
     @Transactional
     @Query(

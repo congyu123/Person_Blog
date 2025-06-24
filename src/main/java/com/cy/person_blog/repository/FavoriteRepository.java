@@ -21,7 +21,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
     boolean existsByUserIdAndArticleIdAndType(Integer userId, Integer articleId, FavoriteType type);
 
     void deleteByUserIdAndArticleIdAndType(Integer userId, Integer articleId, FavoriteType type);
-    // FavoriteRepository.java 新增查询方法
     @Query("""
       SELECT DATE(f.createdAt) AS date, COUNT(f)
       FROM Favorite f

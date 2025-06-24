@@ -8,8 +8,6 @@ public interface CommentService {
 
     List<Comment> listCommentsByArticleId(Integer articleId);
 
-    /**
-     * 新增评论或回复
-     */
+
     void addComment(Comment comment);
 }

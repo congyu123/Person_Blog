@@ -1,4 +1,3 @@
-// CategoryRepository.java
 package com.cy.person_blog.repository;
 
 import com.cy.person_blog.entity.Category;

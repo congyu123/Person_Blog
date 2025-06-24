@@ -1,4 +1,3 @@
-// CategoryServiceImpl.java
 package com.cy.person_blog.service.impl;
 
 import com.cy.person_blog.entity.Category;

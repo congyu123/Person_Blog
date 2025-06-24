@@ -24,7 +24,6 @@
         .navbar-brand:hover {
             color: #ffe49b !important;
         }
-        /* 主导航按钮 */
         .nav-main .nav-link, .nav-main .btn {
             color: rgba(255,255,255,0.92) !important;
             font-size: 1.09rem;
@@ -70,7 +69,6 @@
             width: 70%;
         }
 
-        /* 用户头像和昵称 */
         .user-profile {
             display: flex;
             align-items: center;
@@ -105,7 +103,6 @@
             background-color: #fff;
             color: #343a40;
         }
-        /* 小屏折叠菜单 */
         @media (max-width: 991.98px) {
             .nav-main {flex-direction: column; gap: 8px;}
             .navbar-brand {margin-right: 0;}
@@ -136,14 +133,12 @@
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
-                <!-- 未登录 -->
                 <li th:if="${session.currentUser == null}" class="nav-item">
                     <a class="btn btn-warning ms-2" th:href="@{/login}"><i class="bi bi-person-circle me-1"></i>登录</a>
                 </li>
                 <li th:if="${session.currentUser == null}" class="nav-item">
                     <a class="btn btn-outline-light ms-2" th:href="@{/register}">注册</a>
                 </li>
-                <!-- 已登录 -->
                 <li th:unless="${session.currentUser == null}" class="nav-item me-3 user-profile">
                     <a th:href="@{/profile}" class="d-flex align-items-center text-decoration-none">
                         <img th:src="@{/uploads/avatars/{file}(file=${session.currentUser.avatar_url})}" alt="头像" class="rounded-circle">

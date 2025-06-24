@@ -34,16 +34,14 @@ public class Report {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 举报对象类型枚举
     public enum TargetType {
-        ARTICLE,    // 文章
-        COMMENT     // 评论
+        ARTICLE,
+        COMMENT
     }
 
-    // 举报状态枚举
     public enum ReportStatus {
-        PENDING,    // 待处理
-        RESOLVED    // 已处理
+        PENDING,
+        RESOLVED
     }
 
     public Integer getId() {
@@ -118,11 +116,9 @@ public class Report {
         this.target = target;
     }
 
-    // 非数据库字段，用于存储举报人信息
     @Transient
     private User reporter;
 
-    // 非数据库字段，用于存储被举报的文章或评论
     @Transient
-    private Object target; // 可以是Article或Comment对象
+    private Object target;
 }
