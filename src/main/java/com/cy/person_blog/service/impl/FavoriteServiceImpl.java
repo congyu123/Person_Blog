@@ -14,10 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
@@ -144,5 +142,12 @@ public class FavoriteServiceImpl implements FavoriteService {
         }
         return stats;
     }
-
+    @Override
+    public List<Article> listUserFavoriteArticles(Integer userId, Favorite.FavoriteType type) {
+        List<Favorite> favs = favoriteRepository.findByUserIdAndType(userId, type);
+        return favs.stream()
+                .map(f -> articleRepo.findByIdAndStatus(f.getArticleId(), Article.Status.PUBLISHED))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 }

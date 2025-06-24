@@ -66,4 +66,30 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     @Query("UPDATE Article a SET a.status = :status WHERE a.id = :id")
     int updateStatusById(@Param("id") Integer id,
                          @Param("status") Article.Status status);
+    // 按浏览量排序
+    @Query("SELECT a FROM Article a WHERE a.status = 'PUBLISHED' ORDER BY a.viewCount DESC")
+    List<Article> findPopularByViews(Pageable pageable);
+
+    // 按点赞量排序
+    @Query("SELECT a, COUNT(f) as likeCount " +
+            "FROM Article a " +
+            "LEFT JOIN Favorite f ON a.id = f.articleId AND f.type = 'LIKE' " +
+            "WHERE a.status = 'PUBLISHED' " +
+            "GROUP BY a.id " +
+            "ORDER BY likeCount DESC")
+    List<Object[]> findPopularByLikes(Pageable pageable);
+
+    // 按收藏量排序
+    @Query("SELECT a, COUNT(f) as favoriteCount " +
+            "FROM Article a " +
+            "LEFT JOIN Favorite f ON a.id = f.articleId AND f.type = 'FAVORITE' " +
+            "WHERE a.status = 'PUBLISHED' " +
+            "GROUP BY a.id " +
+            "ORDER BY favoriteCount DESC")
+    List<Object[]> findPopularByFavorites(Pageable pageable);
+    List<Article> findTop5ByStatusAndCategoryIdAndIdNotOrderByCreatedAtDesc(
+            Article.Status status,
+            Integer categoryId,
+            Integer excludeId
+    );
 }

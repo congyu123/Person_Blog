@@ -1,6 +1,7 @@
 package com.cy.person_blog.controller;
 
 import com.cy.person_blog.entity.Article;
+import com.cy.person_blog.entity.Favorite;
 import com.cy.person_blog.entity.User;
 import com.cy.person_blog.service.ArticleService;
 import com.cy.person_blog.service.FavoriteService;
@@ -40,7 +41,7 @@ public class ProfileController {
         // 头像 URL
         String avatarUrl = (user.getAvatar_url() != null && !user.getAvatar_url().isEmpty())
                 ? "/uploads/avatars/" + user.getAvatar_url()
-                : "/static/img/default-avatar.png";
+                : "static/img/default-avatar.png";
         model.addAttribute("userAvatarUrl", avatarUrl);
 
         Integer userId = user.getId();
@@ -65,7 +66,17 @@ public class ProfileController {
         long followingCount = followService.countFollowing(userId);
         model.addAttribute("followerCount", followerCount);
         model.addAttribute("followingCount", followingCount);
+        model.addAttribute("followingCount", followingCount);
+        model.addAttribute("followingList", followService.getFollowing(userId));
 
+        // 新增：我点赞的／我收藏的
+        List<Article> likedArticles =
+                favoriteService.listUserFavoriteArticles(userId, Favorite.FavoriteType.LIKE);
+        List<Article> favoritedArticles =
+                favoriteService.listUserFavoriteArticles(userId, Favorite.FavoriteType.FAVORITE);
+
+        model.addAttribute("likedArticles", likedArticles);
+        model.addAttribute("favoritedArticles", favoritedArticles);
         return "profile";
     }
 
@@ -91,7 +102,7 @@ public class ProfileController {
             session.setAttribute("currentUser", updated);
 
             resp.put("success", true);
-            resp.put("avatarUrl", "/uploads/avatars/" + filename);
+            resp.put("avatarUrl", "/uploads/avatars" + filename);
         } catch (Exception e) {
             resp.put("success", false);
             resp.put("error", e.getMessage());
@@ -129,7 +140,7 @@ public class ProfileController {
 
         String avatarUrl = (fresh.getAvatar_url() != null && !fresh.getAvatar_url().isEmpty())
                 ? "/uploads/avatars/" + fresh.getAvatar_url()
-                : "/static/img/default-avatar.png";
+                : "static/img/default-avatar.png";
         model.addAttribute("userAvatarUrl", avatarUrl);
 
         Integer userId = fresh.getId();
@@ -169,5 +180,27 @@ public class ProfileController {
         }
         return response;
     }
+    @GetMapping("/{id}")
+    public String viewUserProfile(@PathVariable Integer id,
+                                  Model model,
+                                  HttpSession session) {
+        User user = userService.findById(id);
+        model.addAttribute("user", user);
 
+        List<Article> published = articleService.getByAuthorAndStatus(id, Article.Status.PUBLISHED);
+        List<Article> pending   = articleService.getByAuthorAndStatus(id, Article.Status.PENDING);
+        model.addAttribute("publishedArticles", published);
+        model.addAttribute("pendingArticles", pending);
+
+        long followerCount  = followService.getFollowerCount(id);
+        long followingCount = followService.countFollowing(id);
+        model.addAttribute("followerCount", followerCount);
+        model.addAttribute("followingCount", followingCount);
+
+        User me = (User) session.getAttribute("currentUser");
+        boolean isFollowing = me != null && followService.isFollowing(me.getId(), id);
+        model.addAttribute("isFollowing", isFollowing);
+
+        return "user_profile";
+    }
 }

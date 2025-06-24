@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热门榜单 - 博客平台</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hot-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hot-header h1 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hot-header .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hot-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hot-tab {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hot-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            color: var(--primary);
+        }
+
+        .hot-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .hot-list {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .hot-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+        }
+
+        .hot-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .hot-rank {
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .hot-content {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .hot-content h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .hot-content h3 a {
+            color: var(--dark);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .hot-content h3 a:hover {
+            color: var(--primary);
+        }
+
+        .hot-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .hot-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #6c757d;
+        }
+
+        .stat-item .icon {
+            color: var(--accent);
+        }
+
+        .hot-image {
+            width: 150px;
+            min-height: 120px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hot-item:nth-child(1) .hot-rank {
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.05);
+        }
+
+        .hot-item:nth-child(2) .hot-rank {
+            color: #adb5bd;
+            background: rgba(173, 181, 189, 0.05);
+        }
+
+        .hot-item:nth-child(3) .hot-rank {
+            color: #cd7f32;
+            background: rgba(205, 127, 50, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .hot-item {
+                flex-direction: column;
+            }
+
+            .hot-rank {
+                height: 50px;
+                min-width: 100%;
+            }
+
+            .hot-image {
+                width: 100%;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div th:insert="~{nav.html}"></div>
+
+<div class="hot-header">
+    <div class="container">
+        <div class="icon">
+            <i class="fas" th:classappend="'fa-' + ${icon}"></i>
+        </div>
+        <h1 th:text="${title} + ' TOP10'">热门榜单</h1>
+        <p class="lead">发现最受欢迎的内容</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="hot-tabs">
+        <a th:href="@{/hot/views}" class="hot-tab" th:classappend="${title == '浏览榜'} ? 'active' : ''">
+            <i class="fas fa-eye"></i> 浏览榜
+        </a>
+        <a th:href="@{/hot/likes}" class="hot-tab" th:classappend="${title == '点赞榜'} ? 'active' : ''">
+            <i class="fas fa-thumbs-up"></i> 点赞榜
+        </a>
+        <a th:href="@{/hot/favorites}" class="hot-tab" th:classappend="${title == '收藏榜'} ? 'active' : ''">
+            <i class="fas fa-star"></i> 收藏榜
+        </a>
+    </div>
+
+    <div class="hot-list">
+        <th:block th:each="article, iterStat : ${articles}">
+            <div class="hot-item">
+                <div class="hot-rank">
+                          <span th:text="${iterStat.index + 1}">1</span>
+                </div>
+                <div class="hot-content">
+                    <h3>
+                        <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}">文章标题</a>
+                    </h3>
+                    <div class="hot-meta">
+                            <span>
+                                <i class="fas fa-user"></i>
+                                <span th:text="${article.authorName}">作者</span>
+                            </span>
+                        <span>
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd')}">日期</span>
+                            </span>
+                    </div>
+                    <p class="text-muted" th:text="${article.summaryText} ?: '暂无摘要'">文章摘要内容...</p>
+
+                    <div class="hot-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-eye"></i>
+                            <span th:text="${article.viewCount}">0</span> 浏览
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span th:text="${article.likeCount}">0</span> 点赞
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span th:text="${article.favoriteCount}">0</span> 收藏
+                        </div>
+                    </div>
+                </div>
+
+                <th:block th:if="${article.firstImageUrl}">
+                    <div class="hot-image" th:style="'background-image: url(' + ${article.firstImageUrl} + ')'"></div>
+                </th:block>
+            </div>
+        </th:block>
+    </div>
+</div>
+
+<div th:insert="~{footer.html}"></div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

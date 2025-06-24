@@ -35,7 +35,7 @@ public class ImageUploadController {
 
         Path target = imageDir.resolve(filename);
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-        String url = request.getContextPath() + "/" + uploadDir + filename;
+        String url = request.getContextPath() + "/uploads/images/" + filename;
         return Map.of("location", url);
     }
 }

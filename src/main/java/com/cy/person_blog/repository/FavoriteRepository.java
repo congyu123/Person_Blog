@@ -38,4 +38,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
             @Param("start")      Date start,
             @Param("end")        Date end
     );
+    List<Favorite> findByUserIdAndType(Integer userId, Favorite.FavoriteType type);
+
 }

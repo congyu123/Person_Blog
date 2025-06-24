@@ -42,6 +42,52 @@ public class Article {
     @Transient
     private String categoryName;
 
+    @Transient
+    private Long likeCount = 0L;
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Long getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Long getFavoriteCount() {
+        return favoriteCount;
+    }
+
+    public void setFavoriteCount(Long favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
+
+    public String getSummaryText() {
+        return summaryText;
+    }
+
+    public void setSummaryText(String summaryText) {
+        this.summaryText = summaryText;
+    }
+
+    @Transient
+    private Long favoriteCount = 0L;
+
     @Column(name = "view_count")
     private Integer viewCount = 0;
 
@@ -151,11 +197,4 @@ public class Article {
     @Transient
     private String summaryText;
 
-    public String getSummaryText() {
-        return summaryText;
-    }
-
-    public void setSummaryText(String summaryText) {
-        this.summaryText = summaryText;
-    }
 }

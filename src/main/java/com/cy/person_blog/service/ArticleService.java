@@ -23,5 +23,7 @@ public interface ArticleService {
     Article getPublishedArticleById(Integer id);
     void addViewCount(Integer articleId);
     List<Article> listRelatedArticles(Integer articleId, int topCount);
-
+    List<Article> getPopularByViews(int limit);
+    List<Article> getPopularByLikes(int limit);
+    List<Article> getPopularByFavorites(int limit);
 }

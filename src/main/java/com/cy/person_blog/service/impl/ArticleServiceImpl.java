@@ -4,7 +4,9 @@ package com.cy.person_blog.service.impl;
 import com.cy.person_blog.entity.Article;
 import com.cy.person_blog.entity.Article.Status;
 import com.cy.person_blog.repository.ArticleRepository;
+import com.cy.person_blog.repository.FavoriteRepository;
 import com.cy.person_blog.service.ArticleService;
+import com.cy.person_blog.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleRepository articleRepo;
 
+    @Autowired private UserService userService;
+    @Autowired private FavoriteRepository favoriteRepo;
 
 
     @Override
@@ -124,36 +128,111 @@ public class ArticleServiceImpl implements ArticleService {
         Article current = articleRepo.findById(articleId).orElse(null);
         if (current == null) return Collections.emptyList();
 
-        String tags = current.getTags(); // 形如： "SpringBoot,Java"
-        if (tags == null || tags.trim().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // 拆分多个标签
-        String[] tagArray = tags.split(",");
         Set<Integer> addedIds = new HashSet<>();
-        List<Article> allCandidates = new ArrayList<>();
+        List<Article> candidates = new ArrayList<>();
 
-        for (String t : tagArray) {
-            String keyword = "%" + t.trim() + "%";
-            List<Article> subList = articleRepo
-                    .findTop5ByStatusAndTagsContainingAndIdNotOrderByCreatedAtDesc(
-                            Article.Status.PUBLISHED, keyword, articleId
-                    );
-            for (Article aa : subList) {
-                if (!addedIds.contains(aa.getId())) {
-                    addedIds.add(aa.getId());
-                    allCandidates.add(aa);
+        // —— 1. 标签推荐 ——
+        String tags = current.getTags();
+        if (tags != null && !tags.trim().isEmpty()) {
+            for (String t : tags.split(",")) {
+                String pattern = "%" + t.trim() + "%";
+                List<Article> byTag = articleRepo
+                        .findTop5ByStatusAndTagsContainingAndIdNotOrderByCreatedAtDesc(
+                                Article.Status.PUBLISHED, pattern, articleId
+                        );
+                for (Article a : byTag) {
+                    if (addedIds.add(a.getId())) {
+                        candidates.add(a);
+                    }
                 }
             }
         }
 
-        List<Article> sorted = allCandidates.stream()
+        // —— 2. 同分类推荐 ——
+        Integer catId = current.getCategoryId();
+        if (catId != null) {
+            List<Article> byCat = articleRepo
+                    .findTop5ByStatusAndCategoryIdAndIdNotOrderByCreatedAtDesc(
+                            Article.Status.PUBLISHED, catId, articleId
+                    );
+            for (Article a : byCat) {
+                if (addedIds.add(a.getId())) {
+                    candidates.add(a);
+                }
+            }
+        }
+
+        // —— 3. 全部候选按发布时间倒序、截取前 topCount 条 ——
+        List<Article> sorted = candidates.stream()
                 .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
+                .limit(topCount)
                 .collect(Collectors.toList());
 
-        return sorted.size() <= topCount ? sorted : sorted.subList(0, topCount);
+        // —— 4. （可选）为每条推荐填充首图和摘要 ——
+        Pattern IMG = Pattern.compile("<img[^>]*src=[\"']([^\"']+)[\"'][^>]*>", Pattern.CASE_INSENSITIVE);
+        Pattern TAG = Pattern.compile("(?s)<[^>]*>");
+        for (Article rel : sorted) {
+            String html = rel.getContent();
+            if (html != null) {
+                Matcher m = IMG.matcher(html);
+                if (m.find()) {
+                    String src = m.group(1).replaceAll("^\\.\\./+", "/");
+                    if (!src.startsWith("/")) src = "/" + src;
+                    rel.setFirstImageUrl(src);
+                }
+                String text = TAG.matcher(html).replaceAll("").trim();
+                rel.setSummaryText(text.length() > 100
+                        ? text.substring(0, 100) + "..."
+                        : text);
+            }
+        }
+
+        return sorted;
     }
+
+
+    @Override
+    public List<Article> getPopularByViews(int limit) {
+        Pageable p = PageRequest.of(0, limit);
+        List<Article> list = articleRepo.findPopularByViews(p);
+        // 只需填 authorName，viewCount 已在 entity
+        for (Article a : list) {
+            a.setAuthorName(userService.findById(a.getAuthorId()).getNickname());
+        }
+        return list;
+    }
+
+    @Override
+    public List<Article> getPopularByLikes(int limit) {
+        Pageable p = PageRequest.of(0, limit);
+        List<Object[]> rows = articleRepo.findPopularByLikes(p);
+        List<Article> list = new ArrayList<>();
+        for (Object[] row : rows) {
+            Article a = (Article) row[0];
+            Long cnt = (Long) row[1];
+            // 填充 transient
+            a.setLikeCount(cnt);
+            a.setAuthorName(userService.findById(a.getAuthorId()).getNickname());
+            list.add(a);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Article> getPopularByFavorites(int limit) {
+        Pageable p = PageRequest.of(0, limit);
+        List<Object[]> rows = articleRepo.findPopularByFavorites(p);
+        List<Article> list = new ArrayList<>();
+        for (Object[] row : rows) {
+            Article a = (Article) row[0];
+            Long cnt = (Long) row[1];
+            a.setFavoriteCount(cnt);
+            a.setAuthorName(userService.findById(a.getAuthorId()).getNickname());
+            list.add(a);
+        }
+        return list;
+    }
+
 
 }
 

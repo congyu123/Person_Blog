@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${userProfile.nickname} + ' 的主页'">用户主页</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div th:insert="~{nav}"></div>
+
+<div class="container mt-4">
+    <!-- 个人信息卡 -->
+    <div class="card mb-4">
+        <div class="card-body d-flex align-items-center">
+            <img th:src="@{/uploads/avatars/{f}(f=${userProfile.avatar_url})}"
+                 class="rounded-circle me-3" width="80" height="80" alt="头像"/>
+            <div>
+                <h4 th:text="${userProfile.nickname}">昵称</h4>
+                <p th:text="${userProfile.bio}">个人简介</p>
+                <button id="followBtn" class="btn btn-sm"
+                        th:classappend="${isFollowing} ? 'btn-secondary':'btn-outline-primary'"
+                        th:data-url="@{/users/{id}/follow(id=${userProfile.id})}">
+                    <span th:text="${isFollowing} ? '已关注':'关注'"></span>
+                </button>
+            </div>
+        </div>
+        <div class="card-footer">
+            粉丝：<strong th:text="${followerCount}">0</strong>
+            &nbsp;|&nbsp;
+            关注：<strong th:text="${followingCount}">0</strong>
+        </div>
+    </div>
+
+    <!-- TA 的文章列表 -->
+    <div class="card">
+        <div class="card-header">TA 的文章</div>
+        <ul class="list-group list-group-flush">
+            <li th:each="a : ${articles}" class="list-group-item d-flex justify-content-between">
+                <a th:href="@{/articles/{id}(id=${a.id})}" th:text="${a.title}">文章标题</a>
+                <small class="text-muted" th:text="${#dates.format(a.createdAt,'yyyy-MM-dd')}">日期</small>
+            </li>
+            <li th:if="${#lists.isEmpty(articles)}" class="list-group-item text-muted">
+                暂无已发布文章
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.getElementById('followBtn').addEventListener('click', function(){
+        const url = this.getAttribute('data-url');
+        fetch(url, { method:'POST' })
+            .then(r=>r.text())
+            .then(cnt=>{
+                if(cnt.startsWith('error')) return alert('请先登录');
+                // 更新按钮状态和粉丝数
+                this.textContent = this.textContent==='关注'?'已关注':'关注';
+                this.classList.toggle('btn-secondary');
+                this.classList.toggle('btn-outline-primary');
+                // 同步粉丝数
+                this.closest('.card').querySelector('strong')
+                    .textContent = cnt;
+            });
+    });
+</script>
+</body>
+</html>
